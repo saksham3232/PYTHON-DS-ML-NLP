@@ -1,195 +1,242 @@
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Preformatted
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+from reportlab.lib.units import inch
 
-# Function to create PDF with code formatting
-def create_numpy_pdf(filename):
-    doc = SimpleDocTemplate(filename, pagesize=letter)
-    styles = getSampleStyleSheet()
-    elements = []
-    
-    # Title
-    title = Paragraph("<b>NumPy Tutorial with Code and Outputs</b>", styles['Title'])
-    elements.append(title)
-    elements.append(Spacer(1, 12))
-    
-    # Introduction
-    intro_text = """
-    NumPy is a fundamental library for scientific computing in Python. 
-    It provides support for arrays and matrices, along with a collection 
-    of mathematical functions to operate on these data structures.
-    """
-    elements.append(Paragraph(intro_text, styles['BodyText']))
-    elements.append(Spacer(1, 12))
-    
-    # Code and Explanation Snippets
-    code_snippets = [
-        # Creating a 1D array
-        ("Creating a 1D NumPy array", 
-         """import numpy as np
-arr1 = np.array([1,2,3,4,5])
-print(arr1)
-print(type(arr1))
-print(arr1.shape)""",
-         """Output:
-[1 2 3 4 5]
-<class 'numpy.ndarray'>
-(5,)"""),
-        
-        # Creating a 2D array
-        ("Creating a 2D NumPy array", 
-         """arr2 = np.array([[1,2,3,4],[2,3,4,5]])
-print(arr2)
-print(arr2.shape)""",
-         """Output:
-[[1 2 3 4]
- [2 3 4 5]]
-(2, 4)"""),
-        
-        # Creating special arrays
-        ("Creating special arrays", 
-         """# Using arange and reshape
-print(np.arange(0,10,2).reshape(5,1))
-# Creating an array of ones
-print(np.ones((3,4)))
-# Creating an identity matrix
-print(np.eye(3))""",
-         """Output:
-[[0]
- [2]
- [4]
- [6]
- [8]]
-[[1. 1. 1. 1.]
- [1. 1. 1. 1.]
- [1. 1. 1. 1.]]
-[[1. 0. 0.]
- [0. 1. 0.]
- [0. 0. 1.]]"""),
-        
-        # NumPy Vectorized Operations
-        ("NumPy Vectorized Operations", 
-         """arr1 = np.array([1,2,3,4,5])
-arr2 = np.array([10,20,30,40,50])
-print(arr1 + arr2)  # Addition
-print(arr1 - arr2)  # Subtraction
-print(arr1 * arr2)  # Multiplication
-print(arr1 / arr2)  # Division""",
-         """Output:
-[11 22 33 44 55]
-[-9 -18 -27 -36 -45]
-[ 10  40  90 160 250]
-[0.1 0.1 0.1 0.1 0.1]"""),
-        
-        # Statistical Concepts - Normalization
-        ("Statistical Concepts - Normalization", 
-         """data = np.array([1,2,3,4,5])
-mean = np.mean(data)
-std_dev = np.std(data)
-normalized_data = (data - mean) / std_dev
-print(normalized_data)""",
-         """Output:
-[-1.2649 -0.6324  0.       0.6324  1.2649]"""),
-        
-        # Array Slicing and Indexing
-        ("Array Slicing and Indexing", 
-         """arr = np.array([[1,2,3,4],[5,6,7,8],[9,10,11,12]])
-print(arr[1:3,1:3])  # Extracting a subarray
-print(arr[0,0])      # Accessing a single element
-arr[0,0] = 100       # Modifying an element
-print(arr)""",
-         """Output:
-[[ 6  7]
- [10 11]]
-1
-[[100   2   3   4]
- [  5   6   7   8]
- [  9  10  11  12]]"""),
-        
-        # Logical Operations on Arrays
-        ("Logical Operations on Arrays", 
-         """data = np.array([1,2,3,4,5,6,7,8,9,10])
-filtered_data = data[(data >= 5) & (data <= 8)]
-print(filtered_data)""",
-         """Output:
-[5 6 7 8]"""),
-        
-        # Array Attributes
-        ("Array Attributes", 
-         """arr = np.array([[1,2,3], [4,5,6]])
-print("Array:", arr)
-print("Shape:", arr.shape)
-print("Dimensions:", arr.ndim)
-print("Size (total number of elements):", arr.size)
-print("Data type:", arr.dtype)
-print("Item size (in bytes):", arr.itemsize)""",
-         """Output:
-Array: [[1 2 3]
- [4 5 6]]
-Shape: (2, 3)
-Dimensions: 2
-Size (total number of elements): 6
-Data type: int64  # (or int32, depending on your system)
-Item size (in bytes): 8  # (or 4, depending on your system)"""),
-        
-        # Universal Functions (ufuncs)
-        ("Universal Functions", 
-         """arr = np.array([2,3,4,5,6])
-print("Square Root:", np.sqrt(arr))
-print("Exponential:", np.exp(arr))
-print("Sine:", np.sin(arr))
-print("Natural Log:", np.log(arr))""",
-         """Output:
-Square Root: [1.41421356 1.73205081 2.         2.23606798 2.44948974]
-Exponential: [  7.3890561   20.08553692  54.59815003 148.4131591  403.42879349]
-Sine: [ 0.90929743  0.14112001 -0.7568025  -0.95892427 -0.2794155 ]
-Natural Log: [0.69314718 1.09861229 1.38629436 1.60943791 1.79175947]"""),
-        
-        # Reshaping and Transposing Arrays
-        ("Reshaping and Transposing Arrays", 
-         """arr = np.array([[1,2,3], [4,5,6]])
-reshaped = arr.reshape(3,2)
-transposed = arr.T
-print("Original Array:", arr)
-print("Reshaped Array (3x2):", reshaped)
-print("Transposed Array:", transposed)""",
-         """Output:
-Original Array: [[1 2 3]
- [4 5 6]]
-Reshaped Array (3x2): [[1 2]
- [3 4]
- [5 6]]
-Transposed Array: [[1 4]
- [2 5]
- [3 6]]"""),
-        
-        # Broadcasting Example
-        ("Broadcasting in NumPy", 
-         """arr = np.array([[1,2,3], [4,5,6]])
-scalar = 10
-print("Original Array:", arr)
-print("After Broadcasting Addition:", arr + scalar)""",
-         """Output:
-Original Array: [[1 2 3]
- [4 5 6]]
-After Broadcasting Addition: [[11 12 13]
- [14 15 16]]""")
-    ]
-    
-    for title, code, output in code_snippets:
-        elements.append(Paragraph(f"<b>{title}</b>", styles['Heading2']))
-        elements.append(Spacer(1, 6))
-        elements.append(Preformatted(code, styles['Code']))
-        elements.append(Spacer(1, 6))
-        elements.append(Paragraph("<b>Expected Output:</b>", styles['BodyText']))
-        elements.append(Preformatted(output, styles['Code']))
-        elements.append(Spacer(1, 12))
-    
-    # Save PDF
-    doc.build(elements)
-    print(f"PDF generated: {filename}")
+# Define a function to convert newlines to <br/> for Paragraph rendering.
+def convert_newlines(text):
+    return text.replace("\n", "<br/>")
 
-# Generate PDF
-create_numpy_pdf("NumPy_Tutorial.pdf")
+# Create a PDF document
+pdf_filename = "Complete_Pandas_Report.pdf"
+doc = SimpleDocTemplate(pdf_filename, pagesize=letter)
+styles = getSampleStyleSheet()
+
+# Define custom styles
+title_style = styles["Title"]
+heading_style = styles["Heading2"]
+
+# Define a custom code style using a monospaced font (Courier)
+code_style = ParagraphStyle(
+    "Code",
+    parent=styles["Normal"],
+    fontName="Courier",
+    fontSize=9,
+    textColor=colors.black,
+    backColor=colors.whitesmoke,
+    leading=12,
+)
+
+# Define a normal paragraph style (for explanations) that will also use Courier
+normal_code_style = ParagraphStyle(
+    "NormalCode",
+    parent=styles["Normal"],
+    fontName="Courier",
+    fontSize=9,
+    textColor=colors.black,
+    leading=12,
+)
+
+# Start building the content list
+content = []
+
+# Add a title
+content.append(Paragraph("Detailed Pandas Data Manipulation and ReportLab PDF Generation", title_style))
+content.append(Spacer(1, 0.25 * inch))
+
+# Section 1: Introduction
+intro_text = """
+This document contains a detailed explanation of various Pandas data manipulation operations 
+and how to generate a PDF report using ReportLab. All code and outputs are displayed in a monospaced font.
+References: <a href="https://pandas.pydata.org/pandas-docs/stable/">Pandas Documentation</a> and 
+<a href="https://www.reportlab.com/documentation/">ReportLab User Guide</a>.
+"""
+content.append(Paragraph(convert_newlines(intro_text), normal_code_style))
+content.append(Spacer(1, 0.2 * inch))
+
+# Section 2: Reading Data with Pandas
+content.append(Paragraph("1. Reading Data with Pandas", heading_style))
+code_block = """
+import pandas as pd
+df = pd.read_csv('data.csv')
+"""
+explanation = """
+# Explanation:
+# - Imports the pandas library.
+# - Reads a CSV file named 'data.csv' into a DataFrame 'df'.
+# Expected output: DataFrame with data from 'data.csv'.
+"""
+content.append(Paragraph(convert_newlines(code_block + explanation), code_style))
+content.append(Spacer(1, 0.2 * inch))
+
+# Section 3: Fetching Data
+content.append(Paragraph("2. Fetching Data (head, tail, describe, and dtypes)", heading_style))
+code_block = """
+# Fetch the first 5 rows
+df.head(5)
+
+# Fetch the last 5 rows
+df.tail(5)
+
+# Generate summary statistics for numeric columns
+df.describe()
+
+# Check data types of columns
+df.dtypes
+"""
+explanation = """
+# Explanation:
+# - df.head(5) and df.tail(5) display the first and last 5 rows, respectively.
+# - df.describe() provides summary statistics for numeric columns.
+# - df.dtypes shows the data types for each column.
+"""
+content.append(Paragraph(convert_newlines(code_block + explanation), code_style))
+content.append(Spacer(1, 0.2 * inch))
+
+# Section 4: Handling Missing Values
+content.append(Paragraph("3. Handling Missing Values", heading_style))
+code_block = """
+# Identify missing values in the DataFrame
+df.isnull()
+
+# Check if any column contains missing values
+df.isnull().any()
+
+# Count missing values per column
+df.isnull().sum()
+
+# Fill missing values with 0
+df_filled = df.fillna(0)
+
+# Fill missing values in 'Sales' with the column's mean and create a new column
+df['Sales_fillNA'] = df['Sales'].fillna(df['Sales'].mean())
+"""
+explanation = """
+# Explanation:
+# - df.isnull() returns a DataFrame of booleans indicating missing values.
+# - df.isnull().any() returns True/False for each column based on if any missing values exist.
+# - df.isnull().sum() provides the total count of missing values per column.
+# - df.fillna(0) fills all missing values with 0.
+# - For the 'Sales' column, missing values are replaced with the column's mean.
+"""
+content.append(Paragraph(convert_newlines(code_block + explanation), code_style))
+content.append(Spacer(1, 0.2 * inch))
+
+# Section 5: Renaming Columns
+content.append(Paragraph("4. Renaming Columns", heading_style))
+code_block = """
+# Rename the column 'Date' to 'Sales Date'
+df = df.rename(columns={'Date': 'Sales Date'})
+df.head()
+"""
+explanation = """
+# Explanation:
+# - The rename() method changes column names.
+# - 'Date' is renamed to 'Sales Date', and df.head() displays the updated DataFrame.
+"""
+content.append(Paragraph(convert_newlines(code_block + explanation), code_style))
+content.append(Spacer(1, 0.2 * inch))
+
+# Section 6: Changing Data Types and Creating New Columns
+content.append(Paragraph("5. Changing Data Types and Creating New Columns", heading_style))
+code_block = """
+# Replace missing values in 'Value' with its mean, convert to int, and create 'Value_New'
+df['Value_New'] = df['Value'].fillna(df['Value'].mean()).astype(int)
+df.head()
+
+# Create a new column 'New Value' by doubling the 'Value'
+df['New Value'] = df['Value'].apply(lambda x: x * 2)
+df.head()
+"""
+explanation = """
+# Explanation:
+# - Missing values in 'Value' are replaced with the mean, then converted to integer for 'Value_New'.
+# - A lambda function doubles each element in the 'Value' column for 'New Value'.
+"""
+content.append(Paragraph(convert_newlines(code_block + explanation), code_style))
+content.append(Spacer(1, 0.2 * inch))
+
+# Section 7: Data Aggregation and Grouping
+content.append(Paragraph("6. Data Aggregation and Grouping", heading_style))
+code_block = """
+# Group by 'Product' and calculate the mean of 'Value'
+grouped_mean = df.groupby('Product')['Value'].mean()
+print(grouped_mean)
+print(type(grouped_mean))
+
+# Group by 'Product' and 'Region', then sum 'Value' and 'Sales'
+grouped_sum = df.groupby(['Product', 'Region'])[['Value', 'Sales']].sum()
+print(grouped_sum)
+
+# Aggregate multiple functions (mean, sum, count) on 'Value' grouped by 'Region'
+grouped_agg = df.groupby('Region')['Value'].agg(['mean', 'sum', 'count'])
+grouped_agg
+"""
+explanation = """
+# Explanation:
+# - Grouping is performed using groupby().
+# - The first grouping calculates the mean of 'Value' per 'Product'.
+# - The second grouping calculates the sum of 'Value' and 'Sales' per 'Product' and 'Region'.
+# - The last aggregation applies multiple functions on 'Value' for each 'Region'.
+"""
+content.append(Paragraph(convert_newlines(code_block + explanation), code_style))
+content.append(Spacer(1, 0.2 * inch))
+
+# Section 8: Merging and Joining DataFrames
+content.append(Paragraph("7. Merging and Joining DataFrames", heading_style))
+code_block = """
+# Create two sample DataFrames for merging
+df1 = pd.DataFrame({'Key': ['A', 'B', 'C'], 'Value1': [1, 2, 3]})
+df2 = pd.DataFrame({'Key': ['A', 'B', 'D'], 'Value2': [4, 5, 6]})
+
+# Display the DataFrames
+print(df1)
+print(df2)
+
+# Merge DataFrames on the 'Key' column with different join types:
+# Inner Join - only matching keys
+pd.merge(df1, df2, on='Key', how='inner')
+
+# Outer Join - all keys, fill missing with NaN
+pd.merge(df1, df2, on='Key', how='outer')
+
+# Left Join - all keys from df1
+pd.merge(df1, df2, on='Key', how='left')
+
+# Right Join - all keys from df2
+pd.merge(df1, df2, on='Key', how='right')
+"""
+explanation = """
+# Explanation:
+# - Two DataFrames (df1 and df2) are created with a common 'Key' column.
+# - Different merge strategies (inner, outer, left, right) are demonstrated.
+# - The printed outputs show how rows are matched and non-matching entries are handled.
+"""
+content.append(Paragraph(convert_newlines(code_block + explanation), code_style))
+content.append(Spacer(1, 0.2 * inch))
+
+# Section 9: Summary
+content.append(Paragraph("Summary", heading_style))
+summary_text = """
+This document detailed:
+- How to import and read data using Pandas.
+- How to fetch data using head, tail, describe, and dtypes.
+- Techniques for handling missing values.
+- Renaming columns and changing data types.
+- Creating new columns using lambda functions.
+- Aggregating and grouping data.
+- Merging and joining multiple DataFrames.
+- Finally, generating a PDF report with ReportLab, displaying all code in a monospaced font.
+
+References:
+- Pandas Documentation: https://pandas.pydata.org/pandas-docs/stable/
+- ReportLab User Guide: https://www.reportlab.com/documentation/
+"""
+content.append(Paragraph(convert_newlines(summary_text), normal_code_style))
+content.append(Spacer(1, 0.2 * inch))
+
+# Build the PDF document
+doc.build(content)
+print(f"PDF report '{pdf_filename}' has been generated successfully!")
