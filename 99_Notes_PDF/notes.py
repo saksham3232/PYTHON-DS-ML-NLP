@@ -1,242 +1,146 @@
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
 from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
-from reportlab.lib.units import inch
-
-# Define a function to convert newlines to <br/> for Paragraph rendering.
-def convert_newlines(text):
-    return text.replace("\n", "<br/>")
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+import pandas as pd
 
 # Create a PDF document
-pdf_filename = "Complete_Pandas_Report.pdf"
-doc = SimpleDocTemplate(pdf_filename, pagesize=letter)
-styles = getSampleStyleSheet()
+pdf_file = "data_reading_report.pdf"
+document = SimpleDocTemplate(pdf_file, pagesize=letter)
 
-# Define custom styles
-title_style = styles["Title"]
-heading_style = styles["Heading2"]
-
-# Define a custom code style using a monospaced font (Courier)
-code_style = ParagraphStyle(
-    "Code",
-    parent=styles["Normal"],
-    fontName="Courier",
-    fontSize=9,
-    textColor=colors.black,
-    backColor=colors.whitesmoke,
-    leading=12,
-)
-
-# Define a normal paragraph style (for explanations) that will also use Courier
-normal_code_style = ParagraphStyle(
-    "NormalCode",
-    parent=styles["Normal"],
-    fontName="Courier",
-    fontSize=9,
-    textColor=colors.black,
-    leading=12,
-)
-
-# Start building the content list
+# Create a list to hold the content
 content = []
 
-# Add a title
-content.append(Paragraph("Detailed Pandas Data Manipulation and ReportLab PDF Generation", title_style))
-content.append(Spacer(1, 0.25 * inch))
+# Define styles
+styles = getSampleStyleSheet()
+normal_style = styles['Normal']
+heading_style = styles['Heading1']
+code_style = ParagraphStyle(name='CodeStyle', fontName='Courier', fontSize=10, textColor=colors.black)
+output_style = ParagraphStyle(name='OutputStyle', fontName='Courier', fontSize=10, textColor=colors.green)
 
-# Section 1: Introduction
-intro_text = """
-This document contains a detailed explanation of various Pandas data manipulation operations 
-and how to generate a PDF report using ReportLab. All code and outputs are displayed in a monospaced font.
-References: <a href="https://pandas.pydata.org/pandas-docs/stable/">Pandas Documentation</a> and 
-<a href="https://www.reportlab.com/documentation/">ReportLab User Guide</a>.
-"""
-content.append(Paragraph(convert_newlines(intro_text), normal_code_style))
-content.append(Spacer(1, 0.2 * inch))
+# Title
+content.append(Paragraph("Reading Data From Different Sources", heading_style))
+content.append(Spacer(1, 12))
 
-# Section 2: Reading Data with Pandas
-content.append(Paragraph("1. Reading Data with Pandas", heading_style))
-code_block = """
-import pandas as pd
-df = pd.read_csv('data.csv')
-"""
-explanation = """
-# Explanation:
-# - Imports the pandas library.
-# - Reads a CSV file named 'data.csv' into a DataFrame 'df'.
-# Expected output: DataFrame with data from 'data.csv'.
-"""
-content.append(Paragraph(convert_newlines(code_block + explanation), code_style))
-content.append(Spacer(1, 0.2 * inch))
+# Section 1: JSON Data
+content.append(Paragraph("1. Reading JSON Data", heading_style))
+content.append(Spacer(1, 12))
+json_code = '''import pandas as pd
+from io import StringIO
 
-# Section 3: Fetching Data
-content.append(Paragraph("2. Fetching Data (head, tail, describe, and dtypes)", heading_style))
-code_block = """
-# Fetch the first 5 rows
-df.head(5)
+Data = '{"employee_name": "James", "email": "james@gmail.com", "job_profile": [{"title1":"Team Lead", "title2":"Sr. Developer"}]}'
+df = pd.read_json(StringIO(Data))
+df'''
+content.append(Paragraph("Code:", normal_style))
+content.append(Paragraph(json_code.replace('\n', '<br />'), code_style))  # Replace newlines with HTML line breaks
+content.append(Spacer(1, 12))
+content.append(Paragraph("Output:", normal_style))
+output_json = '''  employee_name            email                                        job_profile
+0         James  james@gmail.com  [{'title1': 'Team Lead', 'title2': 'Sr. Developer'}]'''
+content.append(Paragraph(output_json.replace('\n', '<br />'), output_style))  # Replace newlines with HTML line breaks
+content.append(Spacer(1, 12))
 
-# Fetch the last 5 rows
-df.tail(5)
+# Definition and Syntax for pd.read_json
+content.append(Paragraph("Definition: Reads a JSON string or file and converts it into a DataFrame.", normal_style))
+content.append(Paragraph("Syntax: pd.read_json(path_or_buf, orient=None, ...)", normal_style))
+content.append(Spacer(1, 12))
 
-# Generate summary statistics for numeric columns
-df.describe()
+# Section 2: CSV Data
+content.append(Paragraph("2. Reading CSV Data from a URL", heading_style))
+content.append(Spacer(1, 12))
+csv_code = '''df = pd.read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data", header=None)
+df.head()'''
+content.append(Paragraph("Code:", normal_style))
+content.append(Paragraph(csv_code.replace('\n', '<br />'), code_style))  # Replace newlines with HTML line breaks
+content.append(Spacer(1, 12))
+content.append(Paragraph("Output:", normal_style))
+output_csv = '''   0     1     2     3     4    5     6     7     8     9     10    11    12    13
+0  1  14.23  1.71  2.43  15.6  127  2.80  3.06  0.28  2.29  5.64  1.04  3.92  1065
+1  1  13.20  1.78  2.14  11.2  100  2.65  2.76  0.26  1.28  4.38  1.05  3.40  1050
+2  1  13.16  2.36  2.67  18.6  101  2.80  3.24  0.30  2.81  5.68  1.03  3.17  1185
+3  1  14.37  1.95  2.50  16.8  113  3.85  3.49  0.24  2.18  7.80  0.86  3.45  1480
+4  1  13.24  2.59  2.87  21.0  118  2.80  2.69  0.39  1.82  4.32  1.04  2.93   735'''
+content.append(Paragraph(output_csv.replace('\n', '<br />'), output_style))  # Replace newlines with HTML line breaks
+content.append(Spacer(1, 12))
 
-# Check data types of columns
-df.dtypes
-"""
-explanation = """
-# Explanation:
-# - df.head(5) and df.tail(5) display the first and last 5 rows, respectively.
-# - df.describe() provides summary statistics for numeric columns.
-# - df.dtypes shows the data types for each column.
-"""
-content.append(Paragraph(convert_newlines(code_block + explanation), code_style))
-content.append(Spacer(1, 0.2 * inch))
+# Definition and Syntax for pd.read_csv
+content.append(Paragraph("Definition: Reads a comma-separated values (CSV) file into a DataFrame.", normal_style))
+content.append(Paragraph("Syntax: pd.read_csv(filepath_or_buffer, sep=',', ...)", normal_style))
+content.append(Spacer(1, 12))
 
-# Section 4: Handling Missing Values
-content.append(Paragraph("3. Handling Missing Values", heading_style))
-code_block = """
-# Identify missing values in the DataFrame
-df.isnull()
+# Section 3: HTML Data
+content.append(Paragraph("3. Reading HTML Tables from a URL", heading_style))
+content.append(Spacer(1, 12))
+html_code = '''url = "https://www.fdic.gov/resources/resolutions/bank-failures/failed-bank-list/"
+df = pd.read_html(url)'''
+content.append(Paragraph("Code:", normal_style))
+content.append(Paragraph(html_code.replace('\n', '<br />'), code_style))  # Replace newlines with HTML line breaks
+content.append(Spacer(1, 12))
+content.append(Paragraph("Output:", normal_style))
+output_html = '''                                Bank Name                City      State   Cert  \
+0                     Pulaski Savings Bank             Chicago  Illinois  28611   
+1              The First National Bank of Lindsay              Lindsay   Oklahoma  4134   
+2  Republic First Bank dba Republic Bank         Philadelphia  Pennsylvania  27332   
+3                          Citizens Bank              Sac City       Iowa   8758   
+4                  Heartland Tri-State Bank             Elkhart     Kansas  25851   
 
-# Check if any column contains missing values
-df.isnull().any()
+                     Acquiring Institution     Closing Date   Fund  
+0                             Millennium Bank  January 17, 2025  10548  
+1                     First Bank & Trust Co., Duncan, OK  October 18, 2024  10547  
+2                     Fulton Bank, National Association   April 26, 2024  10546  
+3                     Iowa Trust & Savings Bank   November 3, 2023  10545  
+4                     Dream First Bank, N.A.   July 28, 2023  10544  '''
+content.append(Paragraph(output_html.replace('\n', '<br />'), output_style))  # Replace newlines with HTML line breaks
+content.append(Spacer(1, 12))
 
-# Count missing values per column
-df.isnull().sum()
+# Definition and Syntax for pd.read_html
+content.append(Paragraph("Definition: Reads HTML tables from a specified URL or file and returns a list of DataFrames.", normal_style))
+content.append(Paragraph("Syntax: pd.read_html(io, match=None, ...)", normal_style))
+content.append(Spacer(1, 12))
 
-# Fill missing values with 0
-df_filled = df.fillna(0)
+# Section 4: Excel Data
+content.append(Paragraph("4. Reading Excel Data", heading_style))
+content.append(Spacer(1, 12))
+excel_code = '''df_excel = pd.read_excel('data.xlsx')
+df_excel'''
+content.append(Paragraph("Code:", normal_style))
+content.append(Paragraph(excel_code.replace('\n', '<br />'), code_style))  # Replace newlines with HTML line breaks
+content.append(Spacer(1, 12))
+content.append(Paragraph("Output:", normal_style))
+output_excel = '''      Name  Age
+0   Krish   32
+1    Jack   34
+2   John   31'''
+content.append(Paragraph(output_excel.replace('\n', '<br />'), output_style))  # Replace newlines with HTML line breaks
+content.append(Spacer(1, 12))
 
-# Fill missing values in 'Sales' with the column's mean and create a new column
-df['Sales_fillNA'] = df['Sales'].fillna(df['Sales'].mean())
-"""
-explanation = """
-# Explanation:
-# - df.isnull() returns a DataFrame of booleans indicating missing values.
-# - df.isnull().any() returns True/False for each column based on if any missing values exist.
-# - df.isnull().sum() provides the total count of missing values per column.
-# - df.fillna(0) fills all missing values with 0.
-# - For the 'Sales' column, missing values are replaced with the column's mean.
-"""
-content.append(Paragraph(convert_newlines(code_block + explanation), code_style))
-content.append(Spacer(1, 0.2 * inch))
+# Definition and Syntax for pd.read_excel
+content.append(Paragraph("Definition: Reads an Excel file into a DataFrame.", normal_style))
+content.append(Paragraph("Syntax: pd.read_excel(io, sheet_name=0, ...)", normal_style))
+content.append(Spacer(1, 12))
 
-# Section 5: Renaming Columns
-content.append(Paragraph("4. Renaming Columns", heading_style))
-code_block = """
-# Rename the column 'Date' to 'Sales Date'
-df = df.rename(columns={'Date': 'Sales Date'})
-df.head()
-"""
-explanation = """
-# Explanation:
-# - The rename() method changes column names.
-# - 'Date' is renamed to 'Sales Date', and df.head() displays the updated DataFrame.
-"""
-content.append(Paragraph(convert_newlines(code_block + explanation), code_style))
-content.append(Spacer(1, 0.2 * inch))
+# Section 5: Pickle Data
+content.append(Paragraph("5. Reading Pickle Data", heading_style))
+content.append(Spacer(1, 12))
+pickle_code = '''df_excel.to_pickle('df_excel')
+pd.read_pickle('df_excel')'''
+content.append(Paragraph("Code:", normal_style))
+content.append(Paragraph(pickle_code.replace('\n', '<br />'), code_style))  # Replace newlines with HTML line breaks
+content.append(Spacer(1, 12))
+content.append(Paragraph("Output:", normal_style))
+output_pickle = '''      Name  Age
+0   Krish   32
+1    Jack   34
+2   John   31'''
+content.append(Paragraph(output_pickle.replace('\n', '<br />'), output_style))  # Replace newlines with HTML line breaks
+content.append(Spacer(1, 12))
 
-# Section 6: Changing Data Types and Creating New Columns
-content.append(Paragraph("5. Changing Data Types and Creating New Columns", heading_style))
-code_block = """
-# Replace missing values in 'Value' with its mean, convert to int, and create 'Value_New'
-df['Value_New'] = df['Value'].fillna(df['Value'].mean()).astype(int)
-df.head()
+# Definition and Syntax for pd.to_pickle and pd.read_pickle
+content.append(Paragraph("Definition: Saves a DataFrame to a pickle file and reads it back.", normal_style))
+content.append(Paragraph("Syntax: df.to_pickle(path) and pd.read_pickle(path)", normal_style))
+content.append(Spacer(1, 12))
 
-# Create a new column 'New Value' by doubling the 'Value'
-df['New Value'] = df['Value'].apply(lambda x: x * 2)
-df.head()
-"""
-explanation = """
-# Explanation:
-# - Missing values in 'Value' are replaced with the mean, then converted to integer for 'Value_New'.
-# - A lambda function doubles each element in the 'Value' column for 'New Value'.
-"""
-content.append(Paragraph(convert_newlines(code_block + explanation), code_style))
-content.append(Spacer(1, 0.2 * inch))
+# Build the PDF
+document.build(content)
 
-# Section 7: Data Aggregation and Grouping
-content.append(Paragraph("6. Data Aggregation and Grouping", heading_style))
-code_block = """
-# Group by 'Product' and calculate the mean of 'Value'
-grouped_mean = df.groupby('Product')['Value'].mean()
-print(grouped_mean)
-print(type(grouped_mean))
-
-# Group by 'Product' and 'Region', then sum 'Value' and 'Sales'
-grouped_sum = df.groupby(['Product', 'Region'])[['Value', 'Sales']].sum()
-print(grouped_sum)
-
-# Aggregate multiple functions (mean, sum, count) on 'Value' grouped by 'Region'
-grouped_agg = df.groupby('Region')['Value'].agg(['mean', 'sum', 'count'])
-grouped_agg
-"""
-explanation = """
-# Explanation:
-# - Grouping is performed using groupby().
-# - The first grouping calculates the mean of 'Value' per 'Product'.
-# - The second grouping calculates the sum of 'Value' and 'Sales' per 'Product' and 'Region'.
-# - The last aggregation applies multiple functions on 'Value' for each 'Region'.
-"""
-content.append(Paragraph(convert_newlines(code_block + explanation), code_style))
-content.append(Spacer(1, 0.2 * inch))
-
-# Section 8: Merging and Joining DataFrames
-content.append(Paragraph("7. Merging and Joining DataFrames", heading_style))
-code_block = """
-# Create two sample DataFrames for merging
-df1 = pd.DataFrame({'Key': ['A', 'B', 'C'], 'Value1': [1, 2, 3]})
-df2 = pd.DataFrame({'Key': ['A', 'B', 'D'], 'Value2': [4, 5, 6]})
-
-# Display the DataFrames
-print(df1)
-print(df2)
-
-# Merge DataFrames on the 'Key' column with different join types:
-# Inner Join - only matching keys
-pd.merge(df1, df2, on='Key', how='inner')
-
-# Outer Join - all keys, fill missing with NaN
-pd.merge(df1, df2, on='Key', how='outer')
-
-# Left Join - all keys from df1
-pd.merge(df1, df2, on='Key', how='left')
-
-# Right Join - all keys from df2
-pd.merge(df1, df2, on='Key', how='right')
-"""
-explanation = """
-# Explanation:
-# - Two DataFrames (df1 and df2) are created with a common 'Key' column.
-# - Different merge strategies (inner, outer, left, right) are demonstrated.
-# - The printed outputs show how rows are matched and non-matching entries are handled.
-"""
-content.append(Paragraph(convert_newlines(code_block + explanation), code_style))
-content.append(Spacer(1, 0.2 * inch))
-
-# Section 9: Summary
-content.append(Paragraph("Summary", heading_style))
-summary_text = """
-This document detailed:
-- How to import and read data using Pandas.
-- How to fetch data using head, tail, describe, and dtypes.
-- Techniques for handling missing values.
-- Renaming columns and changing data types.
-- Creating new columns using lambda functions.
-- Aggregating and grouping data.
-- Merging and joining multiple DataFrames.
-- Finally, generating a PDF report with ReportLab, displaying all code in a monospaced font.
-
-References:
-- Pandas Documentation: https://pandas.pydata.org/pandas-docs/stable/
-- ReportLab User Guide: https://www.reportlab.com/documentation/
-"""
-content.append(Paragraph(convert_newlines(summary_text), normal_code_style))
-content.append(Spacer(1, 0.2 * inch))
-
-# Build the PDF document
-doc.build(content)
-print(f"PDF report '{pdf_filename}' has been generated successfully!")
+print(f"PDF report '{pdf_file}' has been generated successfully.")
