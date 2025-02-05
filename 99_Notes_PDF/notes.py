@@ -1,146 +1,278 @@
+import seaborn as sns
+import matplotlib.pyplot as plt
+import pandas as pd
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-import pandas as pd
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle
 
 # Create a PDF document
-pdf_file = "data_reading_report.pdf"
+pdf_file = "Seaborn_Data_Visualization_Report.pdf"
 document = SimpleDocTemplate(pdf_file, pagesize=letter)
 
 # Create a list to hold the content
 content = []
 
-# Define styles
-styles = getSampleStyleSheet()
-normal_style = styles['Normal']
-heading_style = styles['Heading1']
-code_style = ParagraphStyle(name='CodeStyle', fontName='Courier', fontSize=10, textColor=colors.black)
-output_style = ParagraphStyle(name='OutputStyle', fontName='Courier', fontSize=10, textColor=colors.green)
-
 # Title
-content.append(Paragraph("Reading Data From Different Sources", heading_style))
+title_style = ParagraphStyle(name='Title', fontSize=24, spaceAfter=20)
+content.append(Paragraph("Data Visualization with Seaborn", title_style))
+
+# Introduction Section
+content.append(Paragraph("Introduction", style=getSampleStyleSheet()['Heading2']))
+content.append(Paragraph("Seaborn is a Python visualization library based on Matplotlib that provides a high-level interface for drawing attractive and informative statistical graphics. "
+                         "Seaborn helps in creating complex visualizations with just a few lines of code. In this lesson, we will cover the basics of Seaborn, including creating various types of plots and customizing them.", 
+                         style=getSampleStyleSheet()['BodyText']))
 content.append(Spacer(1, 12))
 
-# Section 1: JSON Data
-content.append(Paragraph("1. Reading JSON Data", heading_style))
-content.append(Spacer(1, 12))
-json_code = '''import pandas as pd
-from io import StringIO
-
-Data = '{"employee_name": "James", "email": "james@gmail.com", "job_profile": [{"title1":"Team Lead", "title2":"Sr. Developer"}]}'
-df = pd.read_json(StringIO(Data))
-df'''
-content.append(Paragraph("Code:", normal_style))
-content.append(Paragraph(json_code.replace('\n', '<br />'), code_style))  # Replace newlines with HTML line breaks
-content.append(Spacer(1, 12))
-content.append(Paragraph("Output:", normal_style))
-output_json = '''  employee_name            email                                        job_profile
-0         James  james@gmail.com  [{'title1': 'Team Lead', 'title2': 'Sr. Developer'}]'''
-content.append(Paragraph(output_json.replace('\n', '<br />'), output_style))  # Replace newlines with HTML line breaks
+# Data Source Section
+content.append(Paragraph("Data Source: Tips Dataset", style=getSampleStyleSheet()['Heading2']))
+content.append(Paragraph("The 'tips' dataset is included in the Seaborn library and contains information about restaurant tips. "
+                         "It includes the following columns:", style=getSampleStyleSheet()['BodyText']))
 content.append(Spacer(1, 12))
 
-# Definition and Syntax for pd.read_json
-content.append(Paragraph("Definition: Reads a JSON string or file and converts it into a DataFrame.", normal_style))
-content.append(Paragraph("Syntax: pd.read_json(path_or_buf, orient=None, ...)", normal_style))
+# Data Description
+data_description = [
+    ("Column", "Description"),
+    ("total_bill", "Total bill (in USD)"),
+    ("tip", "Tip amount (in USD)"),
+    ("sex", "Gender of the person paying the bill (Male/Female)"),
+    ("smoker", "Whether the person is a smoker (Yes/No)"),
+    ("day", "Day of the week (Sun, Sat, Thur, Fri)"),
+    ("time", "Time of day (Lunch/Dinner)"),
+    ("size", "Size of the party (number of people)")
+]
+
+# Create a table for data description
+table_data = [[Paragraph(col, getSampleStyleSheet()['Heading3']) for col in data_description[0]]]
+for row in data_description[1:]:
+    table_data.append([Paragraph(item, getSampleStyleSheet()['BodyText']) for item in row])
+
+table = Table(table_data)
+table.setStyle(TableStyle([
+    ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+    ('GRID', (0, 0), (-1, -1), 1, colors.black),
+]))
+
+content.append(table)
 content.append(Spacer(1, 12))
 
-# Section 2: CSV Data
-content.append(Paragraph("2. Reading CSV Data from a URL", heading_style))
+# Load dataset
+tips = sns.load_dataset('tips')
+
+# Scatter Plot
+plt.figure()
+sns.scatterplot(x='total_bill', y='tip', data=tips)
+plt.title('Scatter Plot of Total Bill VS Tip')
+plt.savefig('scatter_plot.png')
+plt.close()
+
+# Add Scatter Plot Image and Code
+content.append(Paragraph("Scatter Plot", style=getSampleStyleSheet()['Heading2']))
+content.append(Image('scatter_plot.png', width=400, height=300))
 content.append(Spacer(1, 12))
-csv_code = '''df = pd.read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data", header=None)
-df.head()'''
-content.append(Paragraph("Code:", normal_style))
-content.append(Paragraph(csv_code.replace('\n', '<br />'), code_style))  # Replace newlines with HTML line breaks
+content.append(Paragraph("Code:", style=getSampleStyleSheet()['Heading3']))
+content.append(Paragraph("sns.scatterplot(x='total_bill', y='tip', data=tips)", style=getSampleStyleSheet()['Code']))
 content.append(Spacer(1, 12))
-content.append(Paragraph("Output:", normal_style))
-output_csv = '''   0     1     2     3     4    5     6     7     8     9     10    11    12    13
-0  1  14.23  1.71  2.43  15.6  127  2.80  3.06  0.28  2.29  5.64  1.04  3.92  1065
-1  1  13.20  1.78  2.14  11.2  100  2.65  2.76  0.26  1.28  4.38  1.05  3.40  1050
-2  1  13.16  2.36  2.67  18.6  101  2.80  3.24  0.30  2.81  5.68  1.03  3.17  1185
-3  1  14.37  1.95  2.50  16.8  113  3.85  3.49  0.24  2.18  7.80  0.86  3.45  1480
-4  1  13.24  2.59  2.87  21.0  118  2.80  2.69  0.39  1.82  4.32  1.04  2.93   735'''
-content.append(Paragraph(output_csv.replace('\n', '<br />'), output_style))  # Replace newlines with HTML line breaks
+content.append(Paragraph("Key Definition: A scatter plot displays values for typically two variables for a set of data. Each point represents an observation in the dataset.", style=getSampleStyleSheet()['BodyText']))
 content.append(Spacer(1, 12))
 
-# Definition and Syntax for pd.read_csv
-content.append(Paragraph("Definition: Reads a comma-separated values (CSV) file into a DataFrame.", normal_style))
-content.append(Paragraph("Syntax: pd.read_csv(filepath_or_buffer, sep=',', ...)", normal_style))
+# Line Plot
+plt.figure()
+sns.lineplot(x='size', y='total_bill', data=tips)
+plt.title('Line Plot of Total Bill VS Size')
+plt.savefig('line_plot.png')
+plt.close()
+
+# Add Line Plot Image and Code
+content.append(Paragraph("Line Plot", style=getSampleStyleSheet()['Heading2']))
+content.append(Image('line_plot.png', width=400, height=300))
+content.append(Spacer(1, 12))
+content.append(Paragraph("Code:", style=getSampleStyleSheet()['Heading3']))
+content.append(Paragraph("sns.lineplot(x='size', y='total_bill', data=tips)", style=getSampleStyleSheet()['Code']))
+content.append(Spacer(1, 12))
+content.append(Paragraph("Key Definition: A line plot is used to display information as a series of data points called 'markers' connected by straight line segments.", style=getSampleStyleSheet()['BodyText']))
 content.append(Spacer(1, 12))
 
-# Section 3: HTML Data
-content.append(Paragraph("3. Reading HTML Tables from a URL", heading_style))
-content.append(Spacer(1, 12))
-html_code = '''url = "https://www.fdic.gov/resources/resolutions/bank-failures/failed-bank-list/"
-df = pd.read_html(url)'''
-content.append(Paragraph("Code:", normal_style))
-content.append(Paragraph(html_code.replace('\n', '<br />'), code_style))  # Replace newlines with HTML line breaks
-content.append(Spacer(1, 12))
-content.append(Paragraph("Output:", normal_style))
-output_html = '''                                Bank Name                City      State   Cert  \
-0                     Pulaski Savings Bank             Chicago  Illinois  28611   
-1              The First National Bank of Lindsay              Lindsay   Oklahoma  4134   
-2  Republic First Bank dba Republic Bank         Philadelphia  Pennsylvania  27332   
-3                          Citizens Bank              Sac City       Iowa   8758   
-4                  Heartland Tri-State Bank             Elkhart     Kansas  25851   
+# Bar Plot
+plt.figure()
+sns.barplot(x='day', y='total_bill', data=tips)
+plt.title('Bar Plot of Total Bill VS Day')
+plt.savefig('bar_plot.png')
+plt.close()
 
-                     Acquiring Institution     Closing Date   Fund  
-0                             Millennium Bank  January 17, 2025  10548  
-1                     First Bank & Trust Co., Duncan, OK  October 18, 2024  10547  
-2                     Fulton Bank, National Association   April 26, 2024  10546  
-3                     Iowa Trust & Savings Bank   November 3, 2023  10545  
-4                     Dream First Bank, N.A.   July 28, 2023  10544  '''
-content.append(Paragraph(output_html.replace('\n', '<br />'), output_style))  # Replace newlines with HTML line breaks
+# Add Bar Plot Image and Code
+content.append(Paragraph("Bar Plot", style=getSampleStyleSheet()['Heading2']))
+content.append(Image('bar_plot.png', width=400, height=300))
+content.append(Spacer(1, 12))
+content.append(Paragraph("Code:", style=getSampleStyleSheet()['Heading3']))
+content.append(Paragraph("sns.barplot(x='day', y='total_bill', data=tips)", style=getSampleStyleSheet()['Code']))
+content.append(Spacer(1, 12))
+content.append(Paragraph("Key Definition: A bar plot is a chart that presents categorical data with rectangular bars. The lengths of the bars are proportional to the values they represent.", style=getSampleStyleSheet()['BodyText']))
 content.append(Spacer(1, 12))
 
-# Definition and Syntax for pd.read_html
-content.append(Paragraph("Definition: Reads HTML tables from a specified URL or file and returns a list of DataFrames.", normal_style))
-content.append(Paragraph("Syntax: pd.read_html(io, match=None, ...)", normal_style))
+# Box Plot
+plt.figure()
+sns.boxplot(x='day', y='total_bill', data=tips)
+plt.title('Box Plot of Total Bill by Day')
+plt.savefig('box_plot.png')
+plt.close()
+
+# Add Box Plot Image and Code
+content.append(Paragraph("Box Plot", style=getSampleStyleSheet()['Heading2']))
+content.append(Image('box_plot.png', width=400, height=300))
+content.append(Spacer(1, 12))
+content.append(Paragraph("Code:", style=getSampleStyleSheet()['Heading3']))
+content.append(Paragraph("sns.boxplot(x='day', y='total_bill', data=tips)", style=getSampleStyleSheet()['Code']))
+content.append(Spacer(1, 12))
+content.append(Paragraph("Key Definition: A box plot (or whisker plot) displays the distribution of data based on a five-number summary ('minimum', first quartile (Q1), median, third quartile (Q3), and 'maximum').", style=getSampleStyleSheet()['BodyText']))
 content.append(Spacer(1, 12))
 
-# Section 4: Excel Data
-content.append(Paragraph("4. Reading Excel Data", heading_style))
+# Violin Plot
+plt.figure()
+sns.violinplot(x='day', y='total_bill', data=tips)
+plt.title('Violin Plot of Total Bill by Day')
+plt.savefig('violin_plot.png')
+plt.close()
+
+# Add Violin Plot Image and Code
+content.append(Paragraph("Violin Plot", style=getSampleStyleSheet()['Heading2']))
+content.append(Image('violin_plot.png', width=400, height=300))
 content.append(Spacer(1, 12))
-excel_code = '''df_excel = pd.read_excel('data.xlsx')
-df_excel'''
-content.append(Paragraph("Code:", normal_style))
-content.append(Paragraph(excel_code.replace('\n', '<br />'), code_style))  # Replace newlines with HTML line breaks
+content.append(Paragraph("Code:", style=getSampleStyleSheet()['Heading3']))
+content.append(Paragraph("sns.violinplot(x='day', y='total_bill', data=tips)", style=getSampleStyleSheet()['Code']))
 content.append(Spacer(1, 12))
-content.append(Paragraph("Output:", normal_style))
-output_excel = '''      Name  Age
-0   Krish   32
-1    Jack   34
-2   John   31'''
-content.append(Paragraph(output_excel.replace('\n', '<br />'), output_style))  # Replace newlines with HTML line breaks
+content.append(Paragraph("Key Definition: A violin plot is similar to a box plot, but it also shows the probability density of the data at different values, which is useful for visualizing the distribution of the data.", style=getSampleStyleSheet()['BodyText']))
 content.append(Spacer(1, 12))
 
-# Definition and Syntax for pd.read_excel
-content.append(Paragraph("Definition: Reads an Excel file into a DataFrame.", normal_style))
-content.append(Paragraph("Syntax: pd.read_excel(io, sheet_name=0, ...)", normal_style))
+# Histogram
+plt.figure()
+sns.histplot(tips['total_bill'], bins=30, kde=False)
+plt.title('Histogram of Total Bill')
+plt.savefig('histogram.png')
+plt.close()
+
+# Add Histogram Image and Code
+content.append(Paragraph("Histogram", style=getSampleStyleSheet()['Heading2']))
+content.append(Image('histogram.png', width=400, height=300))
+content.append(Spacer(1, 12))
+content.append(Paragraph("Code:", style=getSampleStyleSheet()['Heading3']))
+content.append(Paragraph("sns.histplot(tips['total_bill'], bins=30, kde=False)", style=getSampleStyleSheet()['Code']))
+content.append(Spacer(1, 12))
+content.append(Paragraph("Key Definition: A histogram is a graphical representation of the distribution of numerical data, showing the number of data points that fall within a specified range of values (bins).", style=getSampleStyleSheet()['BodyText']))
 content.append(Spacer(1, 12))
 
-# Section 5: Pickle Data
-content.append(Paragraph("5. Reading Pickle Data", heading_style))
+# KDE Plot
+plt.figure()
+sns.kdeplot(tips['total_bill'], fill=True)
+plt.title('KDE Plot of Total Bill')
+plt.savefig('kde_plot.png')
+plt.close()
+
+# Add KDE Plot Image and Code
+content.append(Paragraph("KDE Plot", style=getSampleStyleSheet()['Heading2']))
+content.append(Image('kde_plot.png', width=400, height=300))
 content.append(Spacer(1, 12))
-pickle_code = '''df_excel.to_pickle('df_excel')
-pd.read_pickle('df_excel')'''
-content.append(Paragraph("Code:", normal_style))
-content.append(Paragraph(pickle_code.replace('\n', '<br />'), code_style))  # Replace newlines with HTML line breaks
+content.append(Paragraph("Code:", style=getSampleStyleSheet()['Heading3']))
+content.append(Paragraph("sns.kdeplot(tips['total_bill'], fill=True)", style=getSampleStyleSheet()['Code']))
 content.append(Spacer(1, 12))
-content.append(Paragraph("Output:", normal_style))
-output_pickle = '''      Name  Age
-0   Krish   32
-1    Jack   34
-2   John   31'''
-content.append(Paragraph(output_pickle.replace('\n', '<br />'), output_style))  # Replace newlines with HTML line breaks
+content.append(Paragraph("Key Definition: A Kernel Density Estimate (KDE) plot is a way to estimate the probability density function of a random variable, providing a smooth curve that represents the distribution of the data.", style=getSampleStyleSheet()['BodyText']))
 content.append(Spacer(1, 12))
 
-# Definition and Syntax for pd.to_pickle and pd.read_pickle
-content.append(Paragraph("Definition: Saves a DataFrame to a pickle file and reads it back.", normal_style))
-content.append(Paragraph("Syntax: df.to_pickle(path) and pd.read_pickle(path)", normal_style))
+# Pair Plot
+sns.pairplot(tips)
+plt.savefig('pair_plot.png')
+plt.close()
+
+# Add Pair Plot Image and Code
+content.append (Paragraph("Pair Plot", style=getSampleStyleSheet()['Heading2']))
+content.append(Image('pair_plot.png', width=400, height=300))
+content.append(Spacer(1, 12))
+content.append(Paragraph("Code:", style=getSampleStyleSheet()['Heading3']))
+content.append(Paragraph("sns.pairplot(tips)", style=getSampleStyleSheet()['Code']))
+content.append(Spacer(1, 12))
+content.append(Paragraph("Key Definition: A pair plot is a matrix of scatter plots that shows the relationships between multiple variables in a dataset, allowing for easy visualization of correlations.", style=getSampleStyleSheet()['BodyText']))
+content.append(Spacer(1, 12))
+
+# Heat Map
+corr = tips[['total_bill', 'tip', 'size']].corr()
+plt.figure()
+sns.heatmap(corr, annot=True, cmap='coolwarm')
+plt.title('Heat Map of Correlations')
+plt.savefig('heatmap.png')
+plt.close()
+
+# Add Heat Map Image and Code
+content.append(Paragraph("Heat Map", style=getSampleStyleSheet()['Heading2']))
+content.append(Image('heatmap.png', width=400, height=300))
+content.append(Spacer(1, 12))
+content.append(Paragraph("Code:", style=getSampleStyleSheet()['Heading3']))
+content.append(Paragraph("corr=tips[['total_bill','tip','size']].corr()\nsns.heatmap(corr, annot=True, cmap='coolwarm')", style=getSampleStyleSheet()['Code']))
+content.append(Spacer(1, 12))
+content.append(Paragraph("Key Definition: A heat map is a data visualization technique that shows the magnitude of a phenomenon as color in two dimensions, allowing for easy identification of patterns and correlations.", style=getSampleStyleSheet()['BodyText']))
+content.append(Spacer(1, 12))
+
+# Load sales data
+sales_df = pd.read_csv('C:\\Users\\saksh\\OneDrive\\Desktop\\DS ML NLP\\12_Data_Analysis_With_Python\\sales_data.csv')
+
+# Plot total sales by product
+plt.figure(figsize=(10, 6))
+sns.barplot(x='Product Category', y='Total Revenue', data=sales_df, estimator=sum)
+plt.title('Total Sales by Product')
+plt.xlabel('Product')
+plt.ylabel('Total Sales')
+plt.savefig('total_sales_by_product.png')
+plt.close()
+
+# Add Total Sales by Product Image and Code
+content.append(Paragraph("Total Sales by Product", style=getSampleStyleSheet()['Heading2']))
+content.append(Image('total_sales_by_product.png', width=400, height=300))
+content.append(Spacer(1, 12))
+content.append(Paragraph("Code:", style=getSampleStyleSheet()['Heading3']))
+content.append(Paragraph('''
+plt.figure(figsize=(10,6))
+sns.barplot(x='Product Category',y='Total Revenue',data=sales_df,estimator=sum)
+plt.title('Total Sales by Product')
+plt.xlabel('Product')
+plt.ylabel('Total Sales')
+plt.show()
+''', style=getSampleStyleSheet()['Code']))
+content.append(Spacer(1, 12))
+content.append(Paragraph("Key Definition: This bar plot shows the total sales revenue for each product category, providing insights into which categories are performing best.", style=getSampleStyleSheet()['BodyText']))
+content.append(Spacer(1, 12))
+
+# Plot total sales by region
+plt.figure(figsize=(10, 6))
+sns.barplot(x='Region', y='Total Revenue', data=sales_df, estimator=sum)
+plt.title('Total Sales by Region')
+plt.xlabel('Region')
+plt.ylabel('Total Sales')
+plt.savefig('total_sales_by_region.png')
+plt.close()
+
+# Add Total Sales by Region Image and Code
+content.append(Paragraph("Total Sales by Region", style=getSampleStyleSheet()['Heading2']))
+content.append(Image('total_sales_by_region.png', width=400, height=300))
+content.append(Spacer(1, 12))
+content.append(Paragraph("Code:", style=getSampleStyleSheet()['Heading3']))
+content.append(Paragraph('''
+plt.figure(figsize=(10,6))
+sns.barplot(x='Region',y='Total Revenue',data=sales_df,estimator=sum)
+plt.title('Total Sales by Region')
+plt.xlabel('Region')
+plt.ylabel('Total Sales')
+plt.show()
+''', style=getSampleStyleSheet()['Code']))
+content.append(Spacer(1, 12))
+content.append(Paragraph("Key Definition: This bar plot illustrates the total sales revenue across different regions, highlighting regional performance.", style=getSampleStyleSheet()['BodyText']))
 content.append(Spacer(1, 12))
 
 # Build the PDF
 document.build(content)
 
+# Notify user
 print(f"PDF report '{pdf_file}' has been generated successfully.")
