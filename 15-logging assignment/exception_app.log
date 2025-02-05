@@ -1,0 +1,6 @@
+2025-02-05 19:08:04,625 - exception_logger - ERROR - An exception occurred
+Traceback (most recent call last):
+  File "C:\Users\saksh\AppData\Local\Temp\ipykernel_9356\2641850802.py", line 12, in log_exception
+    1/0
+    ~^~
+ZeroDivisionError: division by zero
