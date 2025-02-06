@@ -1,4 +1,4 @@
-# Multithrading with thread pool executor
+# Multithrading with ThreadPoolExecutor
 
 from concurrent.futures import ThreadPoolExecutor
 import time
