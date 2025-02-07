@@ -87,7 +87,7 @@ def create_pdf_report(pdf_file):
         "    filename='app.log',",
         "    filemode='w',",
         "    level=logging.DEBUG,",
-        "    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',",
+        "    format=' '%(asctime)s - %(name)s - %(levelname)s - %(message)s',",
         "    datefmt='%Y-%m-%d %H:%M:%S'",
         ")",
         "",
@@ -106,10 +106,51 @@ def create_pdf_report(pdf_file):
     content.append(Paragraph("This configuration logs messages to a file named 'app.log' with a specific format.", normal_style))
     content.append(Spacer(1, 12))
 
+    # Section: Logging with Multiple Loggers
+    content.append(Paragraph("Logging with Multiple Loggers", heading_style))
+    content.append(Paragraph("You can create multiple loggers for different parts of your application. Here is an example:", normal_style))
+    
+    # Code snippet for multiple loggers
+    code_snippet_3 = [
+        "import logging",
+        "",
+        "# create a logger for module1",
+        "logger1 = logging.getLogger('module1')",
+        "logger1.setLevel(logging.DEBUG)",
+        "",
+        "# create a logger for module2",
+        "logger2 = logging.getLogger('module2')",
+        "logger2.setLevel(logging.WARNING)",
+        "",
+        "# Configure logging settings",
+        "logging.basicConfig(",
+        "    level=logging.DEBUG,",
+        "    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',",
+        "    datefmt='%Y-%m-%d %H:%M:%S'",
+        ")",
+        "",
+        "# log messages with different loggers",
+        "logger1.debug('This is a debug message for module1')",
+        "logger1.critical('This is a critical message for logger1')",
+        "logger2.warning('This is a warning message for module2')",
+        "logger2.error('This is an error message')"
+    ]
+    
+    for line in code_snippet_3:
+        content.append(Paragraph(line, code_style))
+    
+    content.append(Spacer(1, 12))
+    content.append(Paragraph("This example demonstrates how to create and use multiple loggers for different modules in your application.", normal_style))
+    content.append(Spacer(1, 12))
+
     # Conclusion
     content.append(Paragraph("Conclusion", heading_style))
     content.append(Paragraph("Logging is an essential part of application development, allowing developers to monitor and debug their applications effectively.", normal_style))
     content.append(Spacer(1, 12))
+
+    # References
+    content.append(Paragraph("References", heading_style))
+    content.append(Paragraph("For further reading on Python logging, you can visit the official documentation: https://docs.python.org/3/library/logging.html", normal_style))
 
     # Build the PDF
     document.build(content)
