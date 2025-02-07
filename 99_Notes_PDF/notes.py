@@ -1,578 +1,63 @@
-from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch  # Import inch here
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
 
 # Create a PDF document
-pdf_file = "12-Python_Logging_Report.pdf"
+pdf_file = "13-program_process_thread.pdf"
 document = SimpleDocTemplate(pdf_file, pagesize=letter)
 
 # Create a list to hold the content
 content = []
 
+# Define styles
+styles = getSampleStyleSheet()
+normal_style = styles['Normal']
+heading_style = styles['Heading1']
+
 # Title
-title_style = ParagraphStyle(name='TitleStyle', fontSize=24, spaceAfter=12)
-content.append(Paragraph("Python Logging: Comprehensive Guide", title_style))
-content.append(Spacer(1, 12))
+content.append(Paragraph("Understanding Programs, Processes, and Threads", heading_style))
+content.append(Spacer(1, 0.2 * inch))
 
 # Introduction
-intro_style = getSampleStyleSheet()['BodyText']
-content.append(Paragraph("This report covers various aspects of logging in Python, including basic logging, logging with different handlers, formatting log messages, and more. Each section includes code snippets and explanations.", intro_style))
-content.append(Spacer(1, 12))
+content.append(Paragraph("This document provides an in-depth overview of programs, processes, and threads in computing, which are fundamental concepts in software development and operating systems.", normal_style))
+content.append(Spacer(1, 0.2 * inch))
 
-# Assignments
-assignments = [
-    {
-        "title": "Assignment 1: Basic Logging",
-        "tasks": [
-            {
-                "code": [
-                    "import logging",
-                    "",
-                    "def basic_logger():",
-                    "    logging.basicConfig(filename='app.log', level=logging.DEBUG)",
-                    "    logging.debug('This is a debug message')",
-                    "    logging.info('This is an info message')",
-                    "    logging.warning('This is a warning message')",
-                    "    logging.error('This is an error message')",
-                    "    logging.critical('This is a critical message')",
-                    "",
-                    "# Test the function",
-                    "basic_logger()"
-                ],
-                "explanation": "This function sets up a basic logger that logs messages of various levels to a file named 'app.log'."
-            },
-            {
-                "code": [
-                    "# The modification is already included in the above function."
-                ],
-                "explanation": "The function already logs messages of levels: DEBUG, INFO, WARNING, ERROR, and CRITICAL."
-            }
-        ]
-    },
-    {
-        "title": "Assignment 2: Logging with Different Handlers",
-        "tasks": [
-            {
-                "code": [
-                    "def logger_with_handlers():",
-                    "    logger = logging.getLogger('my_logger')",
-                    "    logger.setLevel(logging.DEBUG)",
-                    "",
-                    "    file_handler = logging.FileHandler('app.log')",
-                    "    console_handler = logging.StreamHandler()",
-                    "",
-                    "    file_handler.setLevel(logging.DEBUG)",
-                    "    console_handler.setLevel(logging.DEBUG)",
-                    "",
-                    "    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')",
-                    "    file_handler.setFormatter(formatter)",
-                    "    console_handler.setFormatter(formatter)",
-                    "",
-                    "    logger.addHandler(file_handler)",
-                    "    logger.addHandler(console_handler)",
-                    "",
-                    "    logger.debug('This is a debug message')",
-                    "    logger.info('This is an info message')",
-                    "    logger.warning('This is a warning message')",
-                    "    logger.error('This is an error message')",
-                    "    logger.critical('This is a critical message')",
-                    "",
-                    "# Test the function",
-                    "logger_with_handlers()"
-                ],
-                "explanation": "This function creates a logger that logs messages to both a file and the console."
-            },
-            {
-                "code": [
-                    "# The modification is already included in the above function."
-                ],
-                "explanation": "The function already uses different logging levels for the file and console handlers."
-            }
-        ]
-    },
-    {
-        "title": "Assignment 3: Formatting Log Messages",
-        "tasks": [
-            {
-                "code": [
-                    "def logger_with_custom_format():",
-                    "    logger = logging.getLogger('custom_logger')",
-                    "    logger.setLevel(logging.DEBUG)",
-                    "",
-                    "    file_handler = logging.FileHandler('custom_app.log')",
-                    "    console_handler = logging.StreamHandler()",
-                    "",
-                    "    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')",
-                    "    file_handler.setFormatter(formatter)",
-                    "    console_handler.setFormatter(formatter)",
-                    "",
-                    "    logger.addHandler(file_handler)",
-                    "    logger.addHandler(console_handler)",
-                    "",
-                    "    logger.debug('This is a debug message')",
-                    "    logger.info('This is an info message')",
-                    "    logger.warning('This is a warning message')",
-                    "    logger.error('This is an error message')",
-                    "    logger.critical('This is a critical message')",
-                    "",
-                    "# Test the function",
-                    "logger_with_custom_format()"
-                ],
-                "explanation": "This function sets up a logger with a custom format for log messages."
-            },
-            {
-                "code": [
-                    "def logger_with_different_formats():",
-                    "    logger = logging.getLogger('multi_format_logger')",
-                    "    logger.setLevel(logging.DEBUG)",
-                    "",
-                    "    file_handler = logging.FileHandler('multi_format_app.log')",
-                    "    console_handler = logging.StreamHandler()",
-                    "",
-                    "    file_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')",
-                    "    console_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')",
-                    "",
-                    "    file_handler.setFormatter(file_formatter)",
-                    "    console_handler.setFormatter(console_formatter)",
-                    "",
-                    "    logger.addHandler(file_handler)",
-                    "    logger.addHandler(console_handler)",
-                    "",
-                    "    logger.debug('This is a debug message')",
-                    "    logger.info('This is an info message')",
-                    "    logger.warning('This is a warning message')",
-                    "    logger.error('This is an error message')",
-                    "    logger.critical('This is a critical message')",
-                    "",
-                    "# Test the function",
-                    "logger_with_different_formats()"
-                ],
-                "explanation": "This function uses different formats for the file and console handlers."
-            }
-        ]
-    },
-    {
-        "title": "Assignment 4: Rotating Log Files",
-        "tasks": [
-            {
-                "code": [
-                    "from logging.handlers import RotatingFileHandler",
-                    "",
-                    "def logger_with_rotating_file_handler():",
-                    "    logger = logging.getLogger('rotating_logger')",
-                    "    logger.setLevel(logging.DEBUG)",
-                    "",
-                    "    rotating_handler = RotatingFileHandler('rotating_app.log', maxBytes=2000, backupCount=5)",
-                    "    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')",
-                    "    rotating_handler.setFormatter(formatter)",
-                    "",
-                    "    logger.addHandler(rotating_handler)",
-                    "",
-                    "    for i in range(100):",
-                    "        logger.debug('This is debug message number {}'.format(i))",
-                    "",
-                    "logger_with_rotating_file_handler()"
-                ],
-                "explanation": "This function creates a logger that uses a rotating file handler to manage log file sizes."
-            },
-            {
-                "code": [
-                    "# The modification is already included in the above function with backupCount=5."
-                ],
-                "explanation": "The function already keeps a specified number of backup log files."
-            }
-        ]
-    },
-    {
-        "title": "Assignment 5: Logging Exceptions",
-        "tasks": [
-            {
-                "code": [
-                    "def log_exception():",
-                    "    logger = logging.getLogger('exception_logger')",
-                    "    logger.setLevel(logging.ERROR)",
-                    "",
-                    "    file_handler = logging.FileHandler('exception_app.log')",
-                    "    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')",
-                    "    file_handler.setFormatter(formatter)",
-                    "",
-                    "    logger.addHandler(file_handler)",
-                    "",
-                    "    try:",
-                    "        1/0",
-                    "    except Exception as e:",
-                    "        logger.exception('An exception occurred')",
-                    "",
-                    "log_exception()"
-                ],
-                "explanation": "This function logs an exception stack trace to a log file when an exception occurs."
-            },
-            {
-                "code": [
-                    "# The modification is already included in the above function."
-                ],
-                "explanation": "The function already logs the stack trace at the ERROR level."
-            }
-        ]
-    },
-    {
-        "title": "Assignment 6: Contextual Logging",
-        "tasks": [
-            {
-                "code": [
-                    "def logger_with_context():",
-                    "    logger = logging.getLogger('context_logger')",
-                    "    logger.setLevel(logging.DEBUG)",
-                    "",
-                    "    file_handler = logging.FileHandler('context_app.log')",
-                    "    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s - %(funcName)s - %(lineno)d')",
-                    "    file_handler.setFormatter(formatter)",
-                    "",
-                    "    logger.addHandler(file_handler)",
-                    "",
-                    "    def test_func():",
-                    "        logger.debug('This is a debug message')",
-                    "        logger.info('This is an info message')",
-                    "        logger.warning('This is a warning message')",
-                    "        logger.error('This is an error message')",
-                    "        logger.critical('This is a critical message')",
-                    "    ",
-                    "    test_func()",
-                    "",
-                    "# Test the function",
-                    "logger_with_context()"
-                ],
-                "explanation": "This function creates a logger that includes contextual information in the log messages."
-            },
-            {
-                "code": [
-                    "def logger_with_additional_context(user_id, session_id):",
-                    "    logger = logging.getLogger('additional_context_logger')",
-                    "    logger.setLevel(logging.DEBUG)",
-                    "",
-                    "    file_handler = logging.FileHandler('additional_context_app.log')",
-                    "    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s - %(funcName)s - %(lineno)d - UserID: %(user_id)s - SessionID: %(session_id)s')",
-                    "    file_handler.setFormatter(formatter)",
-                    "",
-                    "    logger.addHandler(file_handler)",
-                    "",
-                    "    extra = {'user_id': user_id, 'session_id': session_id}",
-                    "",
-                    "    def test_func():",
-                    "        logger.debug('This is a debug message', extra=extra)",
-                    "        logger.info('This is an info message', extra=extra)",
-                    "        logger.warning('This is a warning message', extra=extra)",
-                    "        logger.error('This is an error message', extra=extra)",
-                    "        logger.critical('This is a critical message', extra=extra)",
-                    "    ",
-                    "    test_func()",
-                    "",
-                    "# Test the function",
-                    "logger_with_additional_context('user123', 'session456')"
-                ],
-                "explanation": "This function logs messages with additional contextual information such as user ID and session ID."
-            }
-        ]
-    },
-    {
-        "title": "Assignment 7: Configuring Logging with a Dictionary",
-        "tasks": [
-            {
-                "code": [
-                    "import logging.config",
-                    "",
-                    "def configure_logging_with_dict():",
-                    "    log_config = {",
-                    "        'version': 1,",
-                    "        'formatters': {",
-                    "            'default': {",
-                    "                'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'",
-                    "            },",
-                    "            'detailed': {",
-                    "                'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s - %(funcName)s - %(lineno)d'",
-                    "            }",
-                    "        },",
-                    "        'handlers': {",
-                    "            'file': {",
-                    "                'class': 'logging.FileHandler',",
-                    "                'filename': 'dict_config_app.log',",
-                    "                'formatter': 'detailed',",
-                    "                'level': 'DEBUG'",
-                    "            },",
-                    "            'console': {",
-                    "                'class': 'logging.StreamHandler',",
-                    "                'formatter': 'default',",
-                    "                'level': 'DEBUG'",
-                    "            }",
-                    "        },",
-                    "        'root': {",
-                    "            'handlers': ['file', 'console'],",
-                    "            'level': 'DEBUG'",
-                    "        }",
-                    "    }",
-                    "    logging.config.dictConfig(log_config)",
-                    "    logger = logging.getLogger('')",
-                    "    logger.debug('This is a debug message')",
-                    "    logger.info('This is an info message')",
-                    "    logger.warning('This is a warning message')",
-                    "    logger.error('This is an error message')",
-                    "    logger.critical('This is a critical message')",
-                    "",
-                    "# Test the function",
-                    "configure_logging_with_dict()"
-                ],
-                "explanation": "This function configures logging using a dictionary to set up handlers and formatters."
-            },
-            {
-                "code": [
-                    "# The modification is already included in the above function."
-                ],
-                "explanation": "The function already includes different logging levels and formats for each handler."
-            }
-        ]
-    },
-    {
-        "title": "Assignment 8: Logging in a Multi-Module Application",
-        "tasks": [
-            {
-                "code": [
-                    "import logging",
-                    "from module_a import module_a_function",
-                    "from module_b import module_b_function",
-                    "",
-                    "def setup_logging():",
-                    "    log_config = {",
-                    "        'version': 1,",
-                    "        'formatters': {",
-                    "            'default': {",
-                    "                'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'",
-                    "            }",
-                    "        },",
-                    "        'handlers': {",
-                    "            'file': {",
-                    "                'class': 'logging.FileHandler',",
-                    "                'filename': 'multi_module_app.log',",
-                    "                'formatter': 'default',",
-                    "                'level': 'DEBUG'",
-                    "            },",
-                    "            'console': {",
-                    "                'class': 'logging.StreamHandler',",
-                    "                'formatter': 'default',",
-                    "                'level': 'DEBUG'",
-                    "            }",
-                    "        },",
-                    "        'root': {",
-                    "            'handlers': ['file', 'console'],",
-                    "            'level': 'DEBUG'",
-                    "        }",
-                    "    }",
-                    "    logging.config.dictConfig(log_config)",
-                    "",
-                    "# Main script",
-                    "if __name__ == '__main__':",
-                    "    setup_logging()",
-                    "    logger = logging.getLogger(__name__)",
-                    "    logger.info('Main module started')",
-                    "    module_a_function()",
-                    "    module_b_function()",
-                    "    logger.info('Main module finished')"
-                ],
-                "explanation": "This script sets up logging for a multi-module application, allowing each module to log messages."
-            },
-            {
-                "code": [
-                    "import logging",
-                    "",
-                    "def module_a_function():",
-                    "    logger = logging.getLogger(__name__)",
-                    "    logger.info('Module A function started')",
-                    "    logger.debug('This is a debug message from Module A')",
-                    "    logger.info('Module A function finished')"
-                ],
-                "explanation": "This function logs messages related to Module A's execution."
-            },
-            {
-                "code": [
-                    "import logging",
-                    "",
-                    "def module_b_function():",
-                    "    logger = logging.getLogger(__name__)",
-                    "    logger.info('Module B function started')",
-                    "    logger.debug('This is a debug message from Module B')",
-                    "    logger.info('Module B function finished')"
-                ],
-                "explanation": "This function logs messages related to Module B's execution."
-            }
-        ]
-    },
-    {
-        "title": "Assignment 9: Logging Performance",
-        "tasks": [
-            {
-                "code": [
-                    "import logging",
-                    "import time",
-                    "from logging.handlers import RotatingFileHandler",
-                    "",
-                    "def benchmark_logging_performance():",
-                    "    logger = logging.getLogger('performance_logger')",
-                    "    logger.setLevel(logging.DEBUG)",
-                    "",
-                    "    # File handler",
-                    "    file_handler = logging.FileHandler('performance_file.log')",
-                    "    file_handler.setLevel(logging.DEBUG)",
-                    "    logger.addHandler(file_handler)",
-                    "",
-                    "    start_time = time.time()",
-                    "    for i in range(10000):",
-                    "        logger.debug('This is a debug message')",
-                    "    end_time = time.time()",
-                    "    print('File handler logging time: {} seconds'.format(end_time - start_time))",
-                    "    logger.removeHandler(file_handler)",
-                    "",
-                    "    # Console handler",
-                    "    console_handler = logging.StreamHandler()",
-                    "    console_handler.setLevel(logging.DEBUG)",
-                    "    logger.addHandler(console_handler)",
-                    "",
-                    "    start_time = time.time()",
-                    "    for i in range(10000):",
-                    "        logger.debug('This is a debug message')",
-                    "    end_time = time.time()",
-                    "    print('Console handler logging time: {} seconds'.format(end_time - start_time))",
-                    "    logger.removeHandler(console_handler)",
-                    "",
-                    "    # Rotating file handler",
-                    "    rotating_handler = RotatingFileHandler('performance_rotating.log', maxBytes=2000, backupCount=5)",
-                    "    rotating_handler.setLevel(logging.DEBUG)",
-                    "    logger.addHandler(rotating_handler)",
-                    "",
-                    "    start_time = time.time()",
-                    "    for i in range(10000):",
-                    "        logger.debug('This is a debug message')",
-                    "    end_time = time.time()",
-                    "    print('Rotating file handler logging time: {} seconds'.format(end_time - start_time))",
-                    "    logger.removeHandler(rotating_handler)",
-                    "",
-                    "# Test the function",
-                    "benchmark_logging_performance()"
-                ],
-                "explanation": "This script benchmarks the performance of logging with different handlers."
-            },
-            {
-                "code": [
-                    "def benchmark_logging_formatting_performance():",
-                    "    logger = logging.getLogger('formatting_performance_logger')",
-                    "    logger.setLevel(logging.DEBUG)",
-                    "",
-                    "    # File handler without formatting",
-                    "    file_handler = logging.FileHandler('performance_no_format.log')",
-                    "    file_handler.setLevel(logging.DEBUG)",
-                    "    logger.addHandler(file_handler)",
-                    "",
-                    "    start_time = time.time()",
-                    "    for i in range(10000):",
-                    "        logger.debug('This is a debug message')",
-                    "    end_time = time.time()",
-                    "    print('File handler logging time without formatting: {} seconds'.format(end_time - start_time))",
-                    "    logger.removeHandler(file_handler)",
-                    "",
-                    "    # File handler with formatting",
-                    "    file_handler = logging.FileHandler('performance_with_format.log')",
-                    "    file_handler.setLevel(logging.DEBUG)",
-                    "    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')",
-                    "    file_handler.setFormatter(formatter)",
-                    "    logger.addHandler(file_handler)",
-                    "",
-                    "    start_time = time.time()",
-                    "    for i in range(10000):",
-                    "        logger.debug('This is a debug message')",
-                    "    end_time = time.time()",
-                    "    print('File handler logging time with formatting: {} seconds'.format(end_time - start_time))",
-                    "    logger.removeHandler(file_handler)",
-                    "",
-                    "# Test the function",
-                    "benchmark_logging_formatting_performance()"
-                ],
-                "explanation": "This script compares the performance of logging with and without message formatting."
-            }
-        ]
-    },
-    {
-        "title": "Assignment 10: Advanced Logging Configuration",
-        "tasks": [
-            {
-                "code": [
-                    "import logging.config",
-                    "",
-                    "def setup_logging_from_file():",
-                    "    logging.config.fileConfig('logging.conf')",
-                    "    logger = logging.getLogger(__name__)",
-                    "    logger.debug('This is a debug message')",
-                    "    logger.info('This is an info message')",
-                    "    logger.warning('This is a warning message')",
-                    "    logger.error('This is an error message')",
-                    "    logger.critical('This is a critical message')",
-                    "",
-                    "# Test the function",
-                    "setup_logging_from_file()"
-                ],
-                "explanation": "This function configures logging using an external configuration file."
-            },
-            {
-                "code": [
-                    "# The modification is already included in the above configuration file."
-                ],
-                "explanation": "The configuration file already uses different logging levels and formats for each handler."
-            }
-        ]
-    }
-]
+# Section: What is a Program?
+content.append(Paragraph("What is a Program?", heading_style))
+content.append(Paragraph("A program is a sequence of instructions written in a programming language that tells a computer how to perform a specific task. Programs can range from simple scripts that automate small tasks to complex applications that manage large systems. They are executed by the computer's processor, which interprets the instructions and performs the specified operations. Examples of programming languages include Python, Java, C++, and JavaScript. Programs are typically stored in files with specific extensions, such as .py for Python or .java for Java.", normal_style))
+content.append(Spacer(1, 0.1 * inch))
 
-# Add assignments to the content
-for assignment in assignments:
-    content.append(Paragraph(assignment["title"], title_style))
-    for task in assignment["tasks"]:
-        content.append(Paragraph("Code Snippet:", intro_style))
-        for line in task["code"]:
-            content.append(Paragraph(line, ParagraphStyle(name='CodeStyle', fontName='Courier', fontSize=10, spaceAfter=2)))
-        content.append(Paragraph("Explanation:", intro_style))
-        content.append(Paragraph(task["explanation"], intro_style))
-        content.append(Spacer(1, 12))
+# Section: What is a Process?
+content.append(Paragraph("What is a Process?", heading_style))
+content.append(Paragraph("A process is an instance of a program that is being executed. When a program is run, the operating system creates a process that includes the program's code, its current activity, and the resources it needs to execute. Each process has its own memory space, which means that one process cannot directly access the memory of another process. This isolation helps prevent errors and security issues. Processes are managed by the operating system, which allocates resources such as CPU time and memory to each process. Each process has a unique Process ID (PID) that the operating system uses to track it.", normal_style))
+content.append(Spacer(1, 0.1 * inch))
 
+# Section: What is a Thread?
+content.append(Paragraph("What is a Thread?", heading_style))
+content.append(Paragraph("A thread is the smallest unit of execution within a process. A process can contain multiple threads, which share the same memory space but can execute independently. Threads are used to perform tasks concurrently, allowing for more efficient use of resources. For example, a web browser may use multiple threads to load different parts of a webpage simultaneously. Threads have their own stack and registers, but they share the code segment, data segment, and heap memory of the process. This shared memory allows for efficient communication between threads but also requires careful management to avoid issues such as race conditions.", normal_style))
+content.append(Spacer(1, 0.1 * inch))
 
-# Key Definitions of Functions and Methods Used
-key_definitions_title = ParagraphStyle(name='KeyDefinitionsTitleStyle', fontSize=18, spaceAfter=12)
-content.append(Paragraph("Key Definitions of Functions and Methods Used", key_definitions_title))
-content.append(Spacer(1, 12))
+# Section: Single-Threaded Process
+content.append(Paragraph("Single-Threaded Process", heading_style))
+content.append(Paragraph("In a single-threaded process, there is only one thread of execution. This means that tasks are performed sequentially, one after the other. While this approach is simpler and easier to manage, it can lead to inefficiencies, especially if a task takes a long time to complete. For example, if a single-threaded application is performing a time-consuming operation, it may become unresponsive to user input until the operation is finished. Single-threaded processes are often easier to debug and maintain, but they may not fully utilize the capabilities of modern multi-core processors.", normal_style))
+content.append(Spacer(1, 0.1 * inch))
 
-key_definitions = [
-    "logging.basicConfig(): Configures the logging system with basic settings, such as the log file name and log level.",
-    "logging.getLogger(name): Retrieves a logger instance with the specified name. If no logger with that name exists, it creates one.",
-    "logger.setLevel(level): Sets the logging level for the logger, determining the severity of messages that will be logged.",
-    "logging.FileHandler(filename): Creates a handler that writes log messages to a specified file.",
-    "logging.StreamHandler(): Creates a handler that writes log messages to the console (standard output).",
-    "logging.Formatter(format): Creates a formatter that specifies the layout of log messages.",
-    "handler.setFormatter(formatter): Assigns a formatter to a handler, defining how log messages will be formatted.",
-    "logger.addHandler(handler): Adds a handler to the logger, allowing it to send log messages to the specified destination (file, console, etc.).",
-    "logger.debug(message): Logs a message with the DEBUG level, used for detailed diagnostic information.",
-    "logger.info(message): Logs a message with the INFO level, used for general information about program execution.",
-    "logger.warning(message): Logs a message with the WARNING level, indicating a potential problem.",
-    "logger.error(message): Logs a message with the ERROR level, indicating a serious problem that prevented a function from performing its task.",
-    "logger.critical(message): Logs a message with the CRITICAL level, indicating a very serious error that may prevent the program from continuing.",
-    "logger.exception(message): Logs a message with the ERROR level, including the stack trace of the exception that was caught.",
-    "RotatingFileHandler(filename, maxBytes, backupCount): Creates a handler that writes log messages to a file, rotating the log file when it reaches a specified size, and keeping a specified number of backup files.",
-    "logging.config.dictConfig(config): Configures logging using a dictionary that specifies the configuration for loggers, handlers, and formatters.",
-    "logging.config.fileConfig(filename): Configures logging using an external configuration file."
-]
+# Section: Multi-Threaded Process
+content.append(Paragraph("Multi-Threaded Process", heading_style))
+content.append(Paragraph("In a multi-threaded process, multiple threads can execute concurrently. This allows for more efficient use of CPU resources, as multiple tasks can be performed at the same time. For example, a multi-threaded application can handle user input while simultaneously performing background calculations. However, managing multiple threads can introduce complexity, such as the need for synchronization to prevent data corruption when threads access shared resources. Common synchronization mechanisms include mutexes, semaphores, and condition variables. Multi-threading can improve the responsiveness of applications, especially in user interfaces, where tasks like loading data can occur in the background while the user continues to interact with the application.", normal_style))
+content.append(Spacer(1, 0.1 * inch))
 
-for definition in key_definitions:
-    content.append(Paragraph(definition, intro_style))
-    content.append(Spacer(1, 6))
+# Section: Examples
+content.append(Paragraph("Examples of Processes and Threads", heading_style))
+content.append(Paragraph("1. Opening a web browser (e.g., Google Chrome) creates a process. Each tab in the browser may run as a separate thread, allowing for concurrent loading of web pages. This means that if one tab is loading a resource, the other tabs remain responsive to user actions.", normal_style))
+content.append(Paragraph("2. A text editor may run a spell checker in a separate thread while allowing the user to continue typing in the main thread. This ensures that the application remains responsive while performing background tasks.", normal_style))
+content.append(Spacer(1, 0.2 * inch))
 
+# Final notes
+content.append(Paragraph("In the next section, we will explore practical applications of multithreading and multiprocessing in Python, including how to implement these concepts in real-world applications.", normal_style))
 
 # Build the PDF
 document.build(content)
 
-print(f"PDF report generated: {pdf_file}")
+print(f"PDF generated successfully: {pdf_file}")
