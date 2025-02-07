@@ -2,161 +2,211 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Preformatted
-import os
 
 # Create a PDF document
-pdf_file = "14-Multi-threading_and_Multi-processing_Report.pdf"
+pdf_file = "9-sql_and_sqlite_guide.pdf"
 document = SimpleDocTemplate(pdf_file, pagesize=letter)
-
-# Create a list to hold the content
-content = []
 
 # Define styles
 styles = getSampleStyleSheet()
-title_style = styles['Title']
-heading_style = styles['Heading1']
-normal_style = styles['BodyText']
-code_style = ParagraphStyle(name='Code', fontName='Courier', fontSize=10, textColor=colors.black)
+normal_style = styles['Normal']
+code_style = ParagraphStyle(
+    'CodeStyle',
+    parent=normal_style,
+    fontName='Courier',
+    fontSize=10,
+    textColor=colors.black,
+    spaceAfter=12,
+)
+
+# Content to be added to the PDF
+content = []
 
 # Title
-content.append(Paragraph("Multi-threading and Multi-processing in Python", title_style))
+content.append(Paragraph("SQL and SQLite: A Comprehensive Guide", styles['Title']))
 content.append(Spacer(1, 12))
 
 # Introduction
-content.append(Paragraph("This report covers the concepts of multi-threading and multi-processing in Python, "
-                         "including code examples and explanations.", normal_style))
+content.append(Paragraph("SQL (Structured Query Language) is a standard language for managing and manipulating relational databases. SQLite is a self-contained, serverless, and zero-configuration database engine that is widely used for embedded database systems. In this lesson, we will cover the basics of SQL and SQLite, including creating databases, tables, and performing various SQL operations.", normal_style))
 content.append(Spacer(1, 12))
 
-# Section 1: Multi-threading
-content.append(Paragraph("1. Multi-threading", heading_style))
+# Key Definitions
+content.append(Paragraph("Key Definitions", styles['Heading2']))
+content.append(Paragraph("SQL: A standard language for accessing and manipulating databases.", normal_style))
+content.append(Paragraph("SQLite: A lightweight, serverless, self-contained SQL database engine.", normal_style))
 content.append(Spacer(1, 12))
 
-# Code snippet for multi-threading
-multi_threading_code = """\
-import threading
-import time
+# Connecting to an SQLite Database
+content.append(Paragraph("Connecting to an SQLite Database", styles['Heading2']))
+connecting_code = """\
+import sqlite3
 
-def print_numbers():
-    for i in range(5):
-        time.sleep(2)
-        print(f"Number:{i}")
-
-def print_letter():
-    for letter in "abcde":
-        time.sleep(2)
-        print(f"Letter:{letter}")
-
-# create 2 threads
-t1=threading.Thread(target=print_numbers)
-t2=threading.Thread(target=print_letter)
-
-t=time.time()
-
-# start the thread
-t1.start()
-t2.start()
-
-# wait for the threads to complete
-t1.join()
-t2.join()
-
-finished_time = time.time() - t
-print(finished_time)
+# Connect to an SQLite database
+connection = sqlite3.connect('example.db')
 """
-
-# Append code with proper indentation
-content.append(Preformatted(multi_threading_code, code_style))
+content.append(Preformatted(connecting_code, code_style))
+content.append(Paragraph("This code snippet demonstrates how to connect to an SQLite database using the sqlite3 module.", normal_style))
+content.append(Paragraph("Key Definition: sqlite3.connect(database) - Establishes a connection to the SQLite database specified by 'database'.", normal_style))
 content.append(Spacer(1, 12))
 
-# Explanation of multi-threading
-content.append(Paragraph("In this code, we create two threads: one for printing numbers and another for printing letters. "
-                         "Each thread sleeps for a specified time to simulate I/O-bound tasks. The use of threads allows "
-                         "the program to perform these tasks concurrently, improving throughput.", normal_style))
-content.append(Spacer(1, 12))
-
-# Built-in Function Definitions
-content.append(Paragraph("Built-in Function Definitions:", heading_style))
-content.append(Spacer(1, 12))
-content.append(Paragraph("1. <code>start()</code>: This method is called on a thread object to start the thread's activity. "
-                         "It invokes the run() method in a separate thread of control.", normal_style))
-content.append(Spacer(1, 12))
-content.append(Paragraph("2. <code>join()</code>: This method is called on a thread object to block the calling thread until the thread whose join() method is called is terminated.", normal_style))
-content.append(Spacer(1, 12))
-content.append(Paragraph("3. <code>sleep(seconds)</code>: This function from the <code>time</code> module suspends execution for the given number of seconds. "
-                         "It is used to simulate a delay in the execution of the program.", normal_style))
-content.append(Spacer(1, 12))
-content.append(Paragraph("4. <code>print()</code>: This built-in function outputs the specified message to the console or other standard output device.", normal_style))
-content.append(Spacer(1, 12))
-
-# Section 2: Multi-processing
-content.append(Paragraph("2. Multi-processing", heading_style))
-content.append(Spacer(1, 12))
-
-# Code snippet for multi-processing
-multi_processing_code = """\
-import multiprocessing
-import time
-
-def square_numbers():
-    for i in range(5):
-        time.sleep(1)
-        print(f"Square: {i*i}")
-
-def cube_numbers():
-    for i in range(5):
-        time.sleep(1.5)
-        print(f"Cube: {i*i*i}")
-
-if __name__ == '__main__':
-    # create 2 processes
-    p1=multiprocessing.Process(target=square_numbers)
-    p2=multiprocessing.Process(target=cube_numbers)
-    t=time.time()
-
-    # start the process
-    p 1.start()
-    p2.start()
-
-    # Wait for the process to complete
-    p1.join()
-    p2.join()
-
-    finished_time = time.time() - t
-    print(finished_time)
+# Creating a Table
+content.append(Paragraph("Creating a Table", styles['Heading2']))
+creating_table_code = """\
+cursor = connection.cursor()
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS employees(
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    age INTEGER,
+    department TEXT
+)
+''')
+# Commit the changes
+connection.commit()
 """
-
-# Append code with proper indentation
-content.append(Preformatted(multi_processing_code, code_style))
+content.append(Preformatted(creating_table_code, code_style))
+content.append(Paragraph("This snippet creates a table named 'employees' with columns for id, name, age, and department.", normal_style))
+content.append(Paragraph("Key Definition: cursor.execute(sql) - Executes the SQL statement provided in 'sql'.", normal_style))
+content.append(Paragraph("Key Definition: CREATE TABLE - Creates a new table in the database.", normal_style))
+content.append(Paragraph("Key Definition: connection.commit() - Saves all changes made to the database.", normal_style))
 content.append(Spacer(1, 12))
 
-# Explanation of multi-processing
-content.append(Paragraph("In this code, we create two processes: one for calculating squares and another for cubes. "
-                         "Each process runs independently, allowing for parallel execution on multiple CPU cores. "
-                         "This is particularly useful for CPU-bound tasks.", normal_style))
+# Inserting Data
+content.append(Paragraph("Inserting Data", styles['Heading2']))
+inserting_data_code = """\
+# Insert data into the employees table
+cursor.execute('''
+INSERT INTO employees(name, age, department)
+VALUES('Krish', 32, 'Data Scientist')
+''')
+# Commit the changes
+connection.commit()
+"""
+content.append(Preformatted(inserting_data_code, code_style))
+content.append(Paragraph("This code inserts a new employee record into the 'employees' table.", normal_style))
+content.append(Paragraph("Key Definition: INSERT INTO table_name (columns) VALUES (values) - Inserts a new record into the specified table.", normal_style))
 content.append(Spacer(1, 12))
 
-# Built-in Function Definitions
-content.append(Paragraph("Built-in Function Definitions:", heading_style))
-content.append(Spacer(1, 12))
-content.append(Paragraph("1. <code>Process()</code>: This class from the <code>multiprocessing</code> module is used to create a new process. "
-                         "It takes a target function as an argument to specify what the process should execute.", normal_style))
-content.append(Spacer(1, 12))
-content.append(Paragraph("2. <code>start()</code>: Similar to the threading module, this method starts the process's activity, invoking the target function in a separate process.", normal_style))
-content.append(Spacer(1, 12))
-content.append(Paragraph("3. <code>join()</code>: This method blocks the calling thread until the process whose join() method is called is terminated.", normal_style))
-content.append(Spacer(1, 12))
-content.append(Paragraph("4. <code>sleep(seconds)</code>: This function from the <code>time</code> module suspends execution for the given number of seconds, used to simulate delays.", normal_style))
-content.append(Spacer(1, 12))
-content.append(Paragraph("5. <code>print()</code>: This built-in function outputs the specified message to the console or other standard output device.", normal_style))
+# Querying Data
+content.append(Paragraph("Querying Data", styles['Heading2']))
+querying_data_code = """\
+# Query the data from the table
+cursor.execute('SELECT * FROM employees')
+rows = cursor.fetchall()
+"""
+content.append(Preformatted(querying_data_code, code_style))
+content.append(Paragraph("This snippet retrieves all records from the 'employees' table.", normal_style))
+content.append(Paragraph("Key Definition: SELECT * FROM table_name - Retrieves all records from the specified table.", normal_style))
+content.append(Paragraph("Key Definition: fetchall() - Fetches all (remaining) rows of a query result, returning a list.", normal_style))
 content.append(Spacer(1, 12))
 
-# Conclusion
-content.append(Paragraph("In conclusion, multi-threading is suitable for I/O-bound tasks, while multi-processing is "
-                         "ideal for CPU-bound tasks. Understanding these concepts can help optimize performance in Python applications.", normal_style))
+# Updating Data
+content.append(Paragraph("Updating Data", styles['Heading2']))
+updating_data_code = """\
+# Update the data in the table
+cursor.execute('''
+UPDATE employees
+SET age = 34
+WHERE name = 'Krish'
+''')
+# Commit the changes
+connection.commit()
+"""
+content.append(Preformatted(updating_data_code, code_style))
+content.append(Paragraph("This code updates the age of the employee named 'Krish'.", normal_style))
+content.append(Paragraph("Key Definition: UPDATE table_name SET column = value WHERE condition - Updates existing records in the specified table based on a condition.", normal_style))
 content.append(Spacer(1, 12))
 
+# Deleting Data
+content.append(Paragraph("Deleting Data", styles['Heading2']))
+deleting_data_code = """\
+# Delete the data from the table
+cursor.execute('''
+DELETE FROM employees
+WHERE name = 'Bob'
+''')
+# Commit the changes
+connection.commit()
+"""
+content.append(Preformatted(deleting_data_code, code_style))
+content.append(Paragraph("This snippet deletes the record of the employee named 'Bob' from the table.", normal_style))
+content.append(Paragraph("Key Definition: DELETE FROM table_name WHERE condition - Deletes records from the specified table based on a condition.", normal_style))
+content.append(Spacer(1, 12))
+
+# Working with Sales Data
+content.append(Paragraph("Working with Sales Data", styles['Heading2']))
+working_with_sales_code = """\
+# Create a sales table
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS sales(
+    id INTEGER PRIMARY KEY,
+    date TEXT NOT NULL,
+    product TEXT NOT NULL,
+    sales INTEGER,
+    region TEXT)
+''')
+# Commit the changes
+connection.commit()
+"""
+content.append(Preformatted(working_with_sales_code, code_style))
+content.append(Paragraph("This code creates a 'sales' table to store sales data.", normal_style))
+content.append(Paragraph("Key Definition: CREATE TABLE IF NOT EXISTS table_name - Creates a new table if it does not already exist.", normal_style))
+content.append(Spacer(1, 12))
+
+# Inserting Sales Data
+content.append(Paragraph("Inserting Sales Data", styles['Heading2']))
+inserting_sales_data_code = """\
+# Prepare sales data
+sales_data = [
+    ('2023-01-01', 'Product1', 100, 'North'),
+    ('2023-01-02', 'Product2', 200, ' South'),
+    ('2023-01-03', 'Product1', 150, 'East'),
+    ('2023-01-04', 'Product3', 250 , 'West'),
+    ('2023-01-05', 'Product2', 300, 'North')
+]
+# Insert multiple records into the sales table
+cursor.executemany('''
+INSERT INTO sales(date, product, sales, region)
+VALUES(?, ?, ?, ?)
+''', sales_data)
+# Commit the changes
+connection.commit()
+"""
+content.append(Preformatted(inserting_sales_data_code, code_style))
+content.append(Paragraph("This code inserts multiple records into the 'sales' table using the executemany method.", normal_style))
+content.append(Paragraph("Key Definition: executemany(sql, seq_of_params) - Executes the same SQL command for each parameter sequence in the provided list.", normal_style))
+content.append(Spacer(1, 12))
+
+# Querying Sales Data
+content.append(Paragraph("Querying Sales Data", styles['Heading2']))
+querying_sales_data_code = """\
+# Query the sales data
+cursor.execute('SELECT * FROM sales')
+rows = cursor.fetchall()
+"""
+content.append(Preformatted(querying_sales_data_code, code_style))
+content.append(Paragraph("This snippet retrieves all records from the 'sales' table.", normal_style))
+content.append(Paragraph("Key Definition: SELECT * FROM table_name - Retrieves all records from the specified table.", normal_style))
+content.append(Paragraph("Key Definition: fetchall() - Fetches all (remaining) rows of a query result, returning a list.", normal_style))
+content.append(Spacer(1, 12))
+
+# Closing the Database Connection
+content.append(Paragraph("Closing the Database Connection", styles['Heading2']))
+closing_connection_code = """\
+# Close the database connection
+connection.close()
+"""
+content.append(Preformatted(closing_connection_code, code_style))
+content.append(Paragraph("This code closes the connection to the SQLite database, ensuring that all resources are released.", normal_style))
+content.append(Paragraph("Key Definition: connection.close() - Closes the database connection.", normal_style))
+content.append(Spacer(1, 12))
+
+# References
+content.append(Paragraph("References", styles['Heading2']))
+content.append(Paragraph("1. SQLite Documentation: https://www.sqlite.org/docs.html", normal_style))
+content.append(Paragraph("2. SQL Tutorial: https://www.w3schools.com/sql/", normal_style))
 
 # Build the PDF
 document.build(content)
 
-print(f"PDF report '{pdf_file}' has been generated successfully.")
+print(f"PDF document '{pdf_file}' created successfully.")
