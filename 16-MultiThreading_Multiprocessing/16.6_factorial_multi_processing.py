@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     start_time=time.time()
 
-    # create a pool of worker processes
+    # Create a pool of worker processes
     with multiprocessing.Pool() as pool:
         results=pool.map(compute_factorial,numbers)
 
