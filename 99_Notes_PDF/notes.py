@@ -106,4 +106,4 @@ content.append(Spacer(1, 0.2 * inch))  # Add space after the code snippet
 
 # Finalizing the PDF
 document.build(content)  # Build the PDF document with the content list
-print(f"{pdf_file} has been created successfully.")  # print a success message indicating the PDF creation
+print(f"{pdf_file} has been created successfully.")  # Print a success message indicating the PDF creation
