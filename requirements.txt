@@ -3,3 +3,5 @@ scikit-learn
 pandas
 numpy
 flask
+memory_profiler
+streamlit
