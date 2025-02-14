@@ -96,7 +96,8 @@ content.append(Spacer(1, 12))
 # Code snippet for box plot
 code_snippet_2 = """
 import seaborn as sns
-lst_marks_with_outliers = [-100, -200, 45, 32, 56, 75, 89, 54, 32, 89, 90, 87, 67, 54, 45, 98, 99, 67, 74, 150, 170, 180]
+lst_marks_with_outliers = [-100, -200, 45, 32, 56, 75, 89, 54, 32, 89, 90, 
+                            87, 67, 54, 45, 98, 99, 67, 74, 150, 170, 180]
 sns.boxplot(lst_marks_with_outliers)
 """
 content.append(Preformatted(code_snippet_2, code_style))
