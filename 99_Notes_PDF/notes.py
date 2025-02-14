@@ -2,9 +2,11 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Preformatted
+import pandas as pd
+import seaborn as sns
 
 # Create a PDF document
-pdf_file = "19-Streamlit_Report.pdf"
+pdf_file = "20-Missing_Values_Report.pdf"
 document = SimpleDocTemplate(pdf_file, pagesize=letter)
 
 # Create a list to hold the content
@@ -12,129 +14,136 @@ content = []
 
 # Define styles
 styles = getSampleStyleSheet()
-normal_style = styles['Normal']  # Style for normal text
-heading_style = styles['Heading1']  # Style for main headings
-code_style = ParagraphStyle(name='CodeStyle', fontName='Courier', fontSize=10, textColor=colors.black)  # Style for code snippets
+title_style = styles['Title']
+heading_style = styles['Heading1']
+normal_style = styles['BodyText']
+code_style = ParagraphStyle(name='CodeStyle', fontName='Courier', fontSize=10, textColor=colors.black)
 
 # Title
-content.append(Paragraph("Streamlit: A Framework for Building Data Applications", heading_style))
-content.append(Spacer(1, 12))  # Adds vertical space after the title
+content.append(Paragraph("Missing Values in Datasets", title_style))
 
 # Introduction
-content.append(Paragraph("Streamlit is an open-source app framework for Machine Learning and Data Science projects. "
-                         "It allows you to create beautiful web applications for your machine learning and data science projects "
-                         "with simple Python scripts. Streamlit is designed to make it easy to build and share data applications, "
-                         "enabling data scientists and machine learning engineers to showcase their work without needing extensive web development skills.", normal_style))
-content.append(Spacer(1, 12))  # Adds space after the introduction
+content.append(Paragraph("This report covers the concept of missing values in datasets, "
+                         "the mechanisms behind them, and various imputation techniques. "
+                         "We will explore examples using the Titanic dataset.", normal_style))
+content.append(Spacer(1, 12))
 
-# Section 1: Installation
-content.append(Paragraph("1. Installation", heading_style))  # Adds a section heading
-content.append(Paragraph("To install Streamlit, you can use pip. Run the following command in your terminal:", normal_style))
-content.append(Spacer(1, 12))  # Adds space before the code snippet
-content.append(Preformatted("pip install streamlit", code_style))  # Displays the installation command in a preformatted style
-content.append(Spacer(1, 12))  # Adds space after the code snippet
+# Section 1: Mechanisms of Missing Values
+content.append(Paragraph("1. Mechanisms of Missing Values", heading_style))
+content.append(Paragraph("Missing values occur in datasets when some information is not stored for a variable. "
+                         "There are three main mechanisms:", normal_style))
+content.append(Spacer(1, 12))
 
-# Section 2: Creating a Simple App
-content.append(Paragraph("2. Creating a Simple App", heading_style))  # Adds a section heading
-content.append(Paragraph("Here is a simple example of a Streamlit application that displays a title and a dataframe:", normal_style))
-content.append(Spacer(1, 12))  # Adds space before the code snippet
-content.append(Preformatted(
-    "import streamlit as st\n"
-    "import pandas as pd\n"
-    "import numpy as np\n\n"
-    "# Title of the application\n"
-    "st.title('Hello Streamlit')\n\n"
-    "# Display a Simple text\n"
-    "st.write('This is a simple text')\n\n"
-    "# Create a simple dataframe\n"
-    "df = pd.DataFrame({\n"
-    "    'First Column': [1, 2, 3, 4],\n"
-    "    'Second Column': [10, 20, 30, 40]\n"
-    "})\n\n"
-    "# Display the dataframe\n"
-    "st.write('Here is the dataframe')\n"
-    "st.write(df)\n\n"
-    "# Create a line chart\n"
-    "chart_data = pd.DataFrame(\n"
-    "    np.random.randn(20, 3), columns=['a','b','c']\n"
-    ")\n\n"
-    "st.line_chart(chart_data)", code_style))  # Displays the code for a simple Streamlit app
-content.append(Spacer(1, 12))  # Adds space after the code snippet
-content.append(Paragraph("In this example, we import Streamlit and pandas, create a simple dataframe, and display it along with a line chart. "
-                         "The line chart visualizes random data, demonstrating how easily Streamlit integrates data visualization into applications.", normal_style))
-content.append(Spacer(1, 12))  # Adds space after the explanation
+# MCAR
+content.append(Paragraph("1.1 Missing Completely at Random (MCAR)", heading_style))
+content.append(Paragraph("Missing completely at random (MCAR) is a type of missing data mechanism in which the probability of a value being missing is unrelated to both the observed data and the missing data. In other words, if the data is MCAR, the missing values are randomly distributed throughout the dataset, and there is no systematic reason for why they are missing."
+                         "\nFor example, in a survey about the prevalence of a certain disease, the missing data might be MCAR if the survey participants with missing values for certain questions were selected randomly and their missing responses are not related to their disease status or any other variables measured in the survey.", normal_style))
+content.append(Spacer(1, 12))
 
-# Section 3: User Input
-content.append(Paragraph("3. User Input", heading_style))  # Adds a section heading
-content.append(Paragraph("Streamlit allows you to capture user input easily. Here is an example:", normal_style))
-content.append(Spacer(1, 12))  # Adds space before the code snippet
-content.append(Preformatted(
-    "import streamlit as st\n"
-    "import pandas as pd\n\n"
-    "st.title('Streamlit Text Input')\n\n"
-    "name = st.text_input('Enter Your Name:') \n"
-    "if name:\n"
-    "    st.write(f'Hello, {name}')\n\n"
-    "age = st.slider('Select Your Age:', 0, 100, 25)\n"
-    "st.write(f'Your age is {age}.')\n\n"
-    "options = ['Python', 'Java', 'C++', 'JavaScript']\n"
-    "choice = st.selectbox('Choose Your Favourite Language:', options)\n"
-    "st.write(f'You Selected {choice}')\n\n"
-    "data = {\n"
-    "    'Name': ['John', 'Jane', 'Jake', 'Jill'],\n"
-    "    'Age': [28, 24, 35, 40],\n"
-    "    'City': ['New York', 'Los Angeles', 'Chicago', 'Houston']\n"
-    "}\n\n"
-    "df = pd.DataFrame(data)\n"
-    "df.to_csv('sampledata.csv')\n"
-    "st.write(df)\n\n"
-    "uploaded_file = st.file_uploader('Choose a CSV File', type='csv')\n\n"
-    "if uploaded_file is not None:\n"
-    "    df = pd.read_csv(uploaded_file)\n"
-    "    st.write(df)", code_style))  # Displays the code for capturing user input
-content.append(Spacer(1, 12))  # Adds space after the code snippet
-content.append(Paragraph("This code snippet captures user input for name, age, and favorite programming language, "
-                         "displays a dataframe, and allows file uploads. Streamlit's interactive widgets make it easy to create dynamic applications that respond to user input.", normal_style))
-content.append(Spacer(1, 12))  # Adds space after the explanation
+# MAR
+content.append(Paragraph("1.2 Missing at Random (MAR)", heading_style))
+content.append(Paragraph("Missing at Random (MAR) is a type of missing data mechanism in which the probability of a value being missing depends only on the observed data, but not on the missing data itself. In other words, if the data is MAR, the missing values are systematically related to the observed data, but not to the missing data. Here are a few examples of missing at random:"
+                         "\nIncome data: Suppose you are collecting income data from a group of people, but some participants choose not to report their income. If the decision to report or not report income is related to the participant's age or gender, but not to their income level, then the data is missing at random."
+                         "\nMedical data: Suppose you are collecting medical data on patients, including their blood pressure, but some patients do not report their blood pressure. If the patients who do not report their blood pressure are more likely to be younger or have healthier lifestyles, but the missingness is not related to their actual blood pressure values, then the data is missing at random.", normal_style))
+content.append(Spacer(1, 12))
 
-# Section 4: File Upload
-content.append(Paragraph("4. File Upload", heading_style))  # Adds a section heading
-content.append(Paragraph("You can also allow users to upload files. Here is how you can do it:", normal_style))
-content.append(Spacer(1, 12))  # Adds space before the code snippet
-content.append(Preformatted(
-    "uploaded_file = st.file_uploader('Choose a CSV File', type='csv')\n"
-    "if uploaded_file is not None:\n"
-    "    df = pd.read_csv(uploaded_file)\n"
-    "    st.write(df)", code_style))  # Displays the code for file upload functionality
-content.append(Spacer(1, 12))  # Adds space after the code snippet
-content.append(Paragraph("This snippet allows users to upload a CSV file and displays its contents. "
-                         "File upload functionality is essential for applications that require user data input, making Streamlit versatile for various use cases.", normal_style))
-content.append(Spacer(1, 12))  # Adds space after the explanation
+# MNAR
+content.append(Paragraph("1.3 Missing Not at Random (MNAR)", heading_style))
+content.append(Paragraph("It is a type of missing data mechanism where the probability of missing values depends on the value of the missing data itself. In other words, if the data is MNAR, the missingness is not random and is dependent on unobserved or unmeasured factors that are associated with the missing values."
+                         "\nFor example, suppose you are collecting data on the income and job satisfaction of employees in a company. If employees who are less satisfied with their jobs are more likely to refuse to report their income, then the data is not missing at random. In this case, the missingness is dependent on job satisfaction, which is not directly observed or measured.", normal_style))
+content.append(Spacer(1, 12))
 
-# Section 5: Customization and Theming
-content.append(Paragraph("5. Customization and Theming", heading_style))  # Adds a section heading
-content.append(Paragraph("Streamlit provides options for customizing the appearance of your application. You can change the layout, colors, and even add custom CSS styles. "
-                         "For example, you can set the page title and icon using the following commands:", normal_style))
-content.append(Spacer(1, 12))  # Adds space before the code snippet
-content.append(Preformatted(
-    "st.set_page_config(page_title='My Streamlit App', page_icon=':shark:', layout='wide')", code_style))  # Displays the code for setting page configuration
-content.append(Spacer(1, 12))  # Adds space after the code snippet
-content.append(Paragraph("This command sets the title and icon of the page and allows for a wide layout, enhancing the user experience.", normal_style))
-content.append(Spacer(1, 12))  # Adds space after the explanation
+# Section 2: Example with Titanic Dataset
+content.append(Paragraph("2. Example with Titanic Dataset", heading_style))
+content.append(Paragraph("We will use the Titanic dataset to demonstrate how to handle missing values.", normal_style))
+content.append(Spacer(1, 12))
+
+# Code Snippet: Load Dataset
+code1 = """
+import seaborn as sns
+df = sns.load_dataset('titanic')
+df.head()
+"""
+content.append(Paragraph("Code Snippet: Load Dataset", heading_style))
+content.append(Preformatted(code1, style=code_style))
+content.append(Spacer(1, 12))
+
+# Explanation
+content.append(Paragraph("This code snippet loads the Titanic dataset using the seaborn library and displays the first few rows.", normal_style))
+content.append(Spacer(1, 12))
+
+# Check for missing values
+code2 = "df.isnull().sum()"
+content.append(Paragraph("Code Snippet: Check for Missing Values", heading_style))
+content.append(Preformatted(code2, style=code_style))
+content.append(Spacer(1, 12))
+
+# Explanation
+content.append(Paragraph("This code checks for missing values in each column of the dataset.", normal_style))
+content.append(Spacer(1, 12))
+
+# Deleting Rows with Missing Values
+code3 = "df.dropna().shape"
+content.append(Paragraph("Code Snippet: Delete Rows with Missing Values", heading_style))
+content.append(Preformatted(code3, style=code_style))
+content.append(Spacer(1, 12))
+
+# Explanation
+content.append(Paragraph("This code snippet deletes rows with any missing values and shows the new shape of the dataset.", normal_style))
+content.append(Spacer(1, 12))
+
+# Imputation Techniques
+content.append(Paragraph("3. Imputation Techniques", heading_style))
+content.append(Paragraph("We can handle missing values using various imputation techniques:", normal_style))
+content.append(Spacer(1, 12))
+
+# Mean Value Imputation
+code4 = """
+df['age_mean'] = df['age'].fillna(df['age'].mean())
+"""
+content.append(Paragraph("3.1 Mean Value Imputation", heading_style))
+content.append(Preformatted(code4, style=code_style))
+content.append(Spacer(1, 12))
+
+# Explanation
+content.append(Paragraph("This code fills missing values in the 'age' column with the mean age.", normal_style))
+content.append(Spacer(1, 12))
+
+# Median Value Imputation
+code5 = """
+df['age_median'] = df['age'].fillna(df['age'].median())
+"""
+content.append(Paragraph("3.2 Median Value Imputation", heading_style))
+content.append(Preformatted(code5, style=code_style))
+content.append(Spacer(1, 12))
+
+# Explanation
+content.append(Paragraph("This code fills missing values in the 'age' column with the median age, which is useful in the presence of outliers.", normal_style))
+content.append(Spacer(1, 12))
+
+# Mode Imputation
+code6 = """
+df['embarked'].unique()
+
+mode_value=df[df['embarked'].notna()]['embarked'].mode()[0]
+
+df['embarked_mode']=df['embarked'].fillna(mode_value)
+"""
+content.append(Paragraph("3.3 Mode Imputation for Categorical Values", heading_style))
+content.append(Preformatted(code6, style=code_style))
+# content.append(Spacer(1, 12))
+
+# Explanation
+content.append(Paragraph("This code fills missing values in the 'embarked' column with the mode (most frequent value).", normal_style))
+# content.append(Spacer(1, 12))
 
 # Conclusion
-content.append(Paragraph("Conclusion", heading_style))  # Adds a conclusion heading
-content.append(Paragraph("Streamlit is a powerful tool for building interactive data applications with minimal effort. "
-                         "With its simple API, you can create complex applications that can visualize data, capture user input, "
-                         "and much more. Its ease of use and flexibility make it an excellent choice for data scientists and developers alike.", normal_style))
-content.append(Spacer(1, 12))  # Adds space after the conclusion
+content.append(Paragraph("4. Conclusion", heading_style))
+content.append(Paragraph("Handling missing values is crucial for data analysis. Understanding the mechanisms behind missing data "
+                         "and applying appropriate imputation techniques can significantly improve the quality of the dataset.", normal_style))
 
-# References
-content.append(Paragraph("References", heading_style))  # Adds a references heading
-content.append(Paragraph("For more information, visit the official Streamlit documentation: "
-                         "<a href='https://docs.streamlit.io'>Streamlit Documentation</a>", normal_style))
 
 # Build the PDF
-document.build(content)  # Generates the PDF document with the content
+document.build(content)
 
-print(f"PDF report '{pdf_file}' has been generated successfully with enhanced details.")  # Confirmation message after PDF generation
+print(f"PDF report '{pdf_file}' has been generated successfully.")
