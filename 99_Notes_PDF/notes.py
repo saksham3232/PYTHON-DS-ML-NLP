@@ -1,116 +1,270 @@
-from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Preformatted
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Preformatted
-import pandas as pd
+from reportlab.lib import colors
 
-# Create a PDF document
-pdf_file = "Target_Guided_Ordinal_Encoding_Report.pdf"
-document = SimpleDocTemplate(pdf_file, pagesize=letter)
-
-# Create a list to hold the content
-content = []
-
-# Define styles
+# Create PDF document
+doc = SimpleDocTemplate("PlayStore_Analysis_Report.pdf", pagesize=letter)
 styles = getSampleStyleSheet()
-normal_style = styles['Normal']
-heading_style = styles['Heading1']
-code_style = ParagraphStyle(name='CodeStyle', fontName='Courier', fontSize=10, textColor=colors.black)
+story = []
+
+# Custom styles
+title_style = ParagraphStyle(
+    name='Title',
+    fontSize=18,
+    leading=22,
+    alignment=1,
+    spaceAfter=18
+)
+
+section_style = ParagraphStyle(
+    name='Section',
+    fontSize=14,
+    leading=18,
+    spaceBefore=12,
+    spaceAfter=12
+)
+
+code_style = ParagraphStyle(
+    name='Code',
+    fontName='Courier',
+    fontSize=10,
+    leading=12,
+    leftIndent=12,
+    spaceBefore=6,
+    spaceAfter=6,
+    backColor=colors.lightgrey
+)
 
 # Title
-content.append(Paragraph("Target Guided Ordinal Encoding", heading_style))
-content.append(Spacer(1, 12))
+story.append(Paragraph("Google Play Store Apps Analysis Report", title_style))
+story.append(Spacer(1, 12))
 
-# Introduction
-content.append(Paragraph("This report covers the concept of Target Guided Ordinal Encoding, "
-                         "a technique used to encode categorical variables based on their relationship "
-                         "with the target variable. This encoding technique is particularly useful when "
-                         "dealing with categorical variables that have a large number of unique categories.", normal_style))
-content.append(Spacer(1, 12))
+# Problem Statement
+problem_statement = ("Today, 1.85 million different apps are available for users to download. "
+                     "Android users have even more from which to choose, with 2.56 million available through the Google Play Store. "
+                     "Our objective is to find the most popular category, the app with the largest number of installs, "
+                     "the app with the largest size, etc.")
+story.append(Paragraph("Problem Statement", getSampleStyleSheet()['Heading2']))
+story.append(Paragraph(problem_statement, getSampleStyleSheet()['BodyText']))
+story.append(Spacer(1, 12))
 
-# Section 1: Sample DataFrame Creation
-content.append(Paragraph("1. Sample DataFrame Creation", heading_style))
-content.append(Spacer(1, 12))
-code_snippet_1 = """
+# Data Collection
+data_collection = "The data consists of 20 columns and 10841 rows."
+story.append(Paragraph("Data Collection", getSampleStyleSheet()['Heading2']))
+story.append(Paragraph(data_collection, getSampleStyleSheet()['BodyText']))
+story.append(Spacer(1, 12))
+
+# Steps to Follow
+story.append(Paragraph("Steps We Are Going to Follow", getSampleStyleSheet()['Heading2']))
+steps = [
+    "Data Cleaning",
+    "Exploratory Data Analysis",
+    "Feature Engineering"
+]
+for step in steps:
+    story.append(Paragraph(f"- {step}", getSampleStyleSheet()['BodyText']))
+story.append(Spacer(1, 12))
+
+# Code Snippet: Importing Libraries and Loading Data
+story.append(Paragraph("Code Snippet: Importing Libraries and Loading Data", getSampleStyleSheet()['Heading2']))
+code1 = """
 import pandas as pd
-
-# create a sample dataframe with a categorical variable and a target variable
-df = pd.DataFrame({
-    'city': ['New York', 'London', 'Paris', 'Tokyo', 'New York', 'Paris'],
-    'price': [200, 150, 300, 250, 180, 320]
-})
-df
-"""
-content.append(Preformatted(code_snippet_1, code_style))
-content.append(Spacer(1, 12))
-content.append(Paragraph("In this section, we create a sample DataFrame with a categorical variable 'city' "
-                         "and a target variable 'price'. This DataFrame will be used to demonstrate the encoding technique.", normal_style))
-content.append(Spacer(1, 12))
-
-# Section 2: Mean Price Calculation
-content.append(Paragraph("2. Mean Price Calculation", heading_style))
-content.append(Spacer(1, 12))
-code_snippet_2 = """
-mean_price = df.groupby('city')['price'].mean().to_dict()
-mean_price
-"""
-content.append(Preformatted(code_snippet_2, code_style))
-content.append(Spacer(1, 12))
-content.append(Paragraph("Here, we calculate the mean price for each city using the groupby method and convert it to a dictionary.", normal_style))
-content.append(Spacer(1, 12))
-
-# Section 3: Encoding the Categorical Variable
-content.append(Paragraph("3. Encoding the Categorical Variable", heading_style))
-content.append(Spacer(1, 12))
-code_snippet_3 = """
-df['city_encoded'] = df['city'].map(mean_price)
-df[['price', 'city_encoded']]
-"""
-content.append(Preformatted(code_snippet_3, code_style))
-content.append(Spacer(1, 12))
-content.append(Paragraph("In this step, we replace each category in the 'city' column with its corresponding mean price, "
-                         "creating a new column 'city_encoded'. This establishes a monotonic relationship between the categorical variable and the target variable.", normal_style))
-content.append(Spacer(1, 12))
-
-# Section 4: Example with Seaborn Dataset
-content.append(Paragraph("4. Example with Seaborn Dataset", heading_style))
-content.append(Spacer(1, 12))
-code_snippet_4 = """
+import numpy as np
+import matplotlib.pyplot as plt
 import seaborn as sns
-df = sns.load_dataset('tips')
-mean_bill = df.groupby('time')['total_bill'].mean().to_dict()
-df['time_encoded'] = df['time'].map(mean_bill)
-df[['time', 'time_encoded']]
+import warnings
+
+warnings.filterwarnings('ignore')
+
+df = pd.read_csv('https://raw.githubusercontent.com/krishnaik06/playstore-Dataset/
+main/googleplaystore.csv')
+df.head()
 """
-content.append(Preformatted(code_snippet_4, code_style))
-content.append(Spacer(1, 12))
-content.append(Paragraph("In this section, we use the 'tips' dataset from the seaborn library to demonstrate the encoding technique. "
-                         "We calculate the mean total bill for each time of day and create a new encoded column.", normal_style))
-content.append(Spacer(1, 12))
+story.append(Preformatted(code1, code_style))
+story.append(Spacer(1, 12))
+
+# Data Overview
+story.append(Paragraph("Data Overview", getSampleStyleSheet()['Heading2']))
+overview = ("The dataset has missing values and consists of various features such as App, Category, Rating, "
+            "Reviews, Size, Installs, Type, Price, Content Rating, Genres, Last Updated, Current Ver, and Android Ver.")
+story.append(Paragraph(overview, getSampleStyleSheet()['BodyText']))
+story.append(Spacer(1, 12))
+
+# Code Snippet: Data Cleaning
+story.append(Paragraph("Code Snippet: Data Cleaning", getSampleStyleSheet()['Heading2']))
+code2 = """
+# Handling Missing Values
+df.isnull().sum()
+
+# Convert Reviews to Integer
+df['Reviews'] = df['Reviews'].astype(int)
+
+# Convert Size to Float
+df['Size'] = df['Size'].str.replace('M', '000').str.replace('k', '').astype(float)
+
+# Convert Installs and Price
+df['Installs'] = df['Installs'].str.replace('+', '').str.replace(',', '').astype(int)
+df['Price'] = df['Price'].str.replace('$', '').astype(float)
+"""
+story.append(Preformatted(code2, code_style))
+story.append(Spacer(1, 12))
+
+# Handling Last Update Feature
+story.append(Paragraph("Handling Last Update Feature", getSampleStyleSheet()['Heading2']))
+code3 = """
+# Convert Last Updated to datetime
+df['Last Updated'] = pd.to_datetime(df['Last Updated'])
+df['Day'] = df['Last Updated'].dt.day
+df['Month'] = df['Last Updated'].dt.month
+df['Year'] = df['Last Updated'].dt.year
+"""
+story.append(Preformatted(code3, code_style))
+story.append(Spacer(1, 12))
+
+# EDA
+story.append(Paragraph("Exploratory Data Analysis (EDA)", getSampleStyleSheet()['Heading2']))
+eda_intro = ("In this section, we will explore the dataset to find insights such as the most popular app category, "
+             "the app with the largest number of installs, and more.")
+story.append(Paragraph(eda_intro, getSampleStyleSheet()['BodyText']))
+story.append(Spacer(1, 12))
+
+# Code Snippet: EDA
+story.append(Paragraph("Code Snippet: EDA", getSampleStyleSheet()['Heading2']))
+code4 = """
+# Most Popular Category
+df['Category'].value_counts().plot.pie(figsize=(15, 16), autopct='%1.1f%%')
+
+# Top 10 App Categories
+category = pd.DataFrame(df['Category'].value_counts())
+category.rename(columns={'Category': "Count"}, inplace=True)
+
+plt.figure(figsize=(15, 6))
+sns.barplot(x=category.index[:10], y='Count', data=category[:10], palette='hls')
+plt.title('Top 10 App Categories')
+plt.xticks(rotation=90)
+plt.show()
+"""
+story.append(Preformatted(code4, code_style))
+story.append(Spacer(1, 12))
+
+# Insights
+insights = ("Insights from the EDA show that the Family category has the most number of apps, followed by Games and Tools. "
+            "The Beauty category has the least number of apps.")
+story.append(Paragraph("Insights", getSampleStyleSheet()['Heading2']))
+story.append(Paragraph(insights, getSampleStyleSheet()['BodyText']))
+story.append(Spacer(1, 12))
+
+# Internal Assignments
+internal_assignments = ("1. Which Category has the largest number of installations?\n"
+                       "2. What are the Top 5 most installed Apps in Each popular Category?\n"
+                       "3. How many apps are there on Google Play Store which get 5 ratings?")
+story.append(Paragraph("Internal Assignments", getSampleStyleSheet()['Heading2']))
+story.append(Paragraph(internal_assignments, getSampleStyleSheet()['BodyText']))
+story.append(Spacer(1, 12))
+
+# Code Snippet: Installations Analysis
+story.append(Paragraph("Code Snippet: Installations Analysis", getSampleStyleSheet()['Heading2']))
+code5 = """
+# Which Category has the largest number of installations?
+df_cat_installs = df.groupby(['Category'])['Installs']
+.sum().sort_values(ascending=False).reset_index()
+
+df_cat_installs.Installs = df_cat_installs.Installs / 
+1000000000  # converting into billions
+
+plt.figure(figsize=(14, 10))
+sns.barplot(x='Installs', y='Category', data=df_cat_installs.head(10))
+plt.xlabel('No. of Installations in Billions')
+plt.title("Most Popular Categories in Play Store", size=20)
+plt.show()
+"""
+story.append(Preformatted(code5, code_style))
+story.append(Spacer(1, 12))
+
+# Code Snippet: Top 5 Most Installed Apps
+story.append(Paragraph("Code Snippet: Top 5 Most Installed Apps", getSampleStyleSheet()['Heading2']))
+code6 = """
+# Top 5 most installed Apps in Each popular Category
+dfa = df.groupby(['Category', 'App'])['Installs'].sum().reset_index()
+dfa = dfa.sort_values('Installs', ascending=False)
+apps = ['GAME', 'COMMUNICATION', 'PRODUCTIVITY', 'SOCIAL']
+
+plt.figure(figsize=(40, 30))
+for i, app in enumerate(apps):
+    df2 = dfa[dfa.Category == app]
+    df3 = df2.head(5)
+    plt.subplot(4, 2, i + 1)
+    sns.barplot(data=df3, x='Installs', y='App')
+    plt.xlabel('Installation in Millions')
+    plt.title(app, size=20)
+
+plt.tight_layout()
+plt.subplots_adjust(hspace=.3)
+plt.show()
+"""
+story.append(Preformatted(code6, code_style))
+story.append(Spacer(1, 12))
+
+# Code Snippet: 5 Rated Apps
+story.append(Paragraph("Code Snippet: 5 Rated Apps", getSampleStyleSheet()['Heading2']))
+code7 = """
+# How many apps are there on Google Play Store which get 5 ratings?
+rating = df.groupby(['Category', 'Installs', 'App'])['Rating']
+.sum().sort_values(ascending=False).reset_index()
+toprating_apps = rating[rating.Rating == 5.0]
+print('Number of 5 rated apps:', toprating_apps.shape[0])
+toprating_apps.head(1)
+"""
+story.append(Preformatted(code7, code_style))
+# story.append(Spacer(1, 12))
+
+# Key Insights Section
+story.append(PageBreak())
+story.append(Paragraph("<b> Key Insights</b>", section_style))
+insights = [
+    "1. Family category has the most apps (18%) followed by Games (11%).",
+    "2. Game category leads in installations with ~35 billion installs.",
+    "3. Subway Surfers is the most installed game with 1B+ installs.",
+    "4. 271 apps have perfect 5-star ratings.",
+    "5. Rating distribution shows most apps have 4-4.5 ratings.",
+    "6. 92.6% of apps are free, while 7.4% are paid."
+]
+
+for insight in insights:
+    story.append(Paragraph(insight, styles["Normal"]))
+    story.append(Spacer(1, 6))
+
+# Glossary Section
+# story.append(PageBreak())
+story.append(Paragraph("<b>Glossary</b>", section_style))
+glossary_terms = {
+    "App": "A software application designed to run on mobile devices.",
+    "Category": "The classification of apps based on their functionality.",
+    "Rating": "A score given to an app based on user reviews.",
+    "Reviews": "The number of user feedback entries for an app.",
+    "Size": "The storage space required by the app.",
+    "Installs": "The total number of times the app has been downloaded.",
+    "Type": "Indicates whether the app is free or paid.",
+    "Price": "The cost of the app if it is paid.",
+    "Content Rating": "The age group for which the app is appropriate.",
+    "Genres": "The specific type of content the app provides.",
+    "Last Updated": "The date when the app was last modified.",
+    "Current Ver": "The current version of the app available.",
+    "Android Ver": "The minimum Android version required to run the app."
+}
+
+for term, definition in glossary_terms.items():
+    story.append(Paragraph(f"<b>{term}:</b> {definition}", styles["Normal"]))
+    story.append(Spacer(1, 6))
 
 # Conclusion
-content.append(Paragraph("Conclusion", heading_style))
-content.append(Spacer(1, 12))
-content.append(Paragraph("Target Guided Ordinal Encoding is a powerful technique for encoding categorical variables, "
-                         "especially when dealing with high cardinality. By establishing a relationship between the categorical variable and the target variable, "
-                         "we can improve the predictive power of our machine learning models.", normal_style))
-content.append(Spacer(1, 12))
+conclusion = ("In conclusion, the analysis of the Google Play Store dataset provides valuable insights into app categories, "
+              "ratings, and installations. This information can be useful for developers and marketers in understanding trends and user preferences.")
+story.append(Paragraph("Conclusion", getSampleStyleSheet()['Heading2']))
+story.append(Paragraph(conclusion, getSampleStyleSheet()['BodyText']))
+story.append(Spacer(1, 12))
 
-
-# Glossary
-content.append(Paragraph("Glossary", heading_style))
-content.append(Spacer(1, 12))
-content.append(Paragraph("1. **Target Variable**: The variable that we are trying to predict or explain in a model.", normal_style))
-content.append(Spacer(1, 12))
-content.append(Paragraph("2. **Categorical Variable**: A variable that can take on one of a limited, and usually fixed, number of possible values, assigning each individual or other unit of observation to a particular group or nominal category.", normal_style))
-content.append(Spacer(1, 12))
-content.append(Paragraph("3. **Mean**: The average value of a set of numbers, calculated by dividing the sum of the values by the number of values.", normal_style))
-content.append(Spacer(1, 12))
-content.append(Paragraph("4. **Monotonic Relationship**: A relationship that is either entirely non-increasing or non-decreasing, meaning that as one variable increases, the other variable either only increases or only decreases.", normal_style))
-content.append(Spacer(1, 12))
-content.append(Paragraph("5. **Encoding**: The process of converting categorical data into a numerical format that can be provided to machine learning algorithms.", normal_style))
-
-# Build the PDF
-document.build(content)
-
+# Build PDF
+doc.build(story)
 print("PDF report generated successfully!")
