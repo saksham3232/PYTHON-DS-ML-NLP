@@ -1,141 +1,116 @@
-# First, ensure you have the required libraries installed
-# You can install them using pip if you haven't already
-# pip install reportlab seaborn matplotlib numpy
-
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Preformatted
-import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Preformatted
+import pandas as pd
 
 # Create a PDF document
-pdf_file = "five_number_summary_report.pdf"
+pdf_file = "Target_Guided_Ordinal_Encoding_Report.pdf"
 document = SimpleDocTemplate(pdf_file, pagesize=letter)
-styles = getSampleStyleSheet()
 
-# Define a new style for code snippets
-code_style = ParagraphStyle(
-    name='CodeStyle',
-    fontName='Courier',
-    fontSize=10,
-    textColor=colors.black,
-    spaceAfter=12,
-    leftIndent=12,
-    rightIndent=12,
-    bulletFontName='Courier',
-    bulletFontSize=10,
-    bulletColor=colors.black,
-)
-
-# Function to create a box plot and save it as an image
-def create_box_plot(data, filename):
-    plt.figure(figsize=(8, 4))
-    sns.boxplot(data)
-    plt.title("Box Plot of Marks")
-    plt.savefig(filename)
-    plt.close()
-
-# Data for the report
-lst_marks = [45, 32, 56, 75, 89, 54, 32, 89, 90, 87, 67, 54, 45, 98, 99, 67, 74]
-
-# Create box plot for the first dataset
-create_box_plot(lst_marks, "box_plot_1.png")
-
-# Create a second dataset with outliers
-lst_marks_with_outliers = [-100, -200, 45, 32, 56, 75, 89, 54, 32, 89, 90, 87, 67, 54, 45, 98, 99, 67, 74, 150, 170, 180]
-create_box_plot(lst_marks_with_outliers, "box_plot_2.png")
-
-# Prepare content for the PDF
+# Create a list to hold the content
 content = []
 
+# Define styles
+styles = getSampleStyleSheet()
+normal_style = styles['Normal']
+heading_style = styles['Heading1']
+code_style = ParagraphStyle(name='CodeStyle', fontName='Courier', fontSize=10, textColor=colors.black)
+
 # Title
-content.append(Paragraph("Five Number Summary and Box Plot Report", styles['Title']))
+content.append(Paragraph("Target Guided Ordinal Encoding", heading_style))
 content.append(Spacer(1, 12))
 
 # Introduction
-content.append(Paragraph("This report covers the five-number summary and box plots for a given dataset of marks.", styles['Normal']))
+content.append(Paragraph("This report covers the concept of Target Guided Ordinal Encoding, "
+                         "a technique used to encode categorical variables based on their relationship "
+                         "with the target variable. This encoding technique is particularly useful when "
+                         "dealing with categorical variables that have a large number of unique categories.", normal_style))
 content.append(Spacer(1, 12))
 
-# Section: Five Number Summary
-content.append(Paragraph("Five Number Summary", styles['Heading2']))
+# Section 1: Sample DataFrame Creation
+content.append(Paragraph("1. Sample DataFrame Creation", heading_style))
 content.append(Spacer(1, 12))
-
-# Code snippet for five-number summary
 code_snippet_1 = """
-import numpy as np
-lst_marks = [45, 32, 56, 75, 89, 54, 32, 89, 90, 87, 67, 54, 45, 98, 99, 67, 74]
-minimum, Q1, median, Q3, maximum = np.quantile(lst_marks, [0, 0.25, 0.50, 0.75, 1.0])
-IQR = Q3 - Q1
-lower_fence = Q1 - 1.5 * IQR
-higher_fence = Q3 + 1.5 * IQR
+import pandas as pd
+
+# create a sample dataframe with a categorical variable and a target variable
+df = pd.DataFrame({
+    'city': ['New York', 'London', 'Paris', 'Tokyo', 'New York', 'Paris'],
+    'price': [200, 150, 300, 250, 180, 320]
+})
+df
 """
 content.append(Preformatted(code_snippet_1, code_style))
 content.append(Spacer(1, 12))
-
-# Explanation of the five-number summary
-content.append(Paragraph("The five-number summary consists of the minimum, first quartile (Q1), median, third quartile (Q3), and maximum values of the dataset. "
-                         "These statistics provide a quick overview of the distribution of the data.", styles['Normal']))
+content.append(Paragraph("In this section, we create a sample DataFrame with a categorical variable 'city' "
+                         "and a target variable 'price'. This DataFrame will be used to demonstrate the encoding technique.", normal_style))
 content.append(Spacer(1, 12))
 
-# Output of the five-number summary
-minimum, Q1, median, Q3, maximum = np.quantile(lst_marks, [0, 0.25, 0.50, 0.75, 1.0])
-content.append(Paragraph("The five-number summary for the dataset is as follows:", styles['Normal']))
-content.append(Paragraph(f"Minimum: {minimum}", styles['Normal']))
-content.append(Paragraph(f"Q1: {Q1}", styles['Normal']))
-content.append(Paragraph(f"Median: {median}", styles['Normal']))
-content.append(Paragraph(f"Q3: {Q3}", styles['Normal']))
-content.append( Paragraph(f"Maximum: {maximum}", styles['Normal']))
+# Section 2: Mean Price Calculation
+content.append(Paragraph("2. Mean Price Calculation", heading_style))
 content.append(Spacer(1, 12))
-
-# Section: Box Plot
-content.append(Paragraph("Box Plot", styles['Heading2']))
-content.append(Spacer(1, 12))
-
-# Code snippet for box plot
 code_snippet_2 = """
-import seaborn as sns
-lst_marks_with_outliers = [-100, -200, 45, 32, 56, 75, 89, 54, 32, 89, 90, 
-                            87, 67, 54, 45, 98, 99, 67, 74, 150, 170, 180]
-sns.boxplot(lst_marks_with_outliers)
+mean_price = df.groupby('city')['price'].mean().to_dict()
+mean_price
 """
 content.append(Preformatted(code_snippet_2, code_style))
 content.append(Spacer(1, 12))
-
-# Explanation of the box plot
-content.append(Paragraph("A box plot visually represents the five-number summary of the dataset. It displays the minimum, Q1, median, Q3, and maximum values, "
-                         "along with any potential outliers. The box represents the interquartile range (IQR), and the line inside the box indicates the median.", styles['Normal']))
+content.append(Paragraph("Here, we calculate the mean price for each city using the groupby method and convert it to a dictionary.", normal_style))
 content.append(Spacer(1, 12))
 
-# Adding the first box plot image
-content.append(Paragraph("Box Plot of Marks (without outliers):", styles['Normal']))
-content.append(Image("box_plot_1.png", width=400, height=200))
+# Section 3: Encoding the Categorical Variable
+content.append(Paragraph("3. Encoding the Categorical Variable", heading_style))
+content.append(Spacer(1, 12))
+code_snippet_3 = """
+df['city_encoded'] = df['city'].map(mean_price)
+df[['price', 'city_encoded']]
+"""
+content.append(Preformatted(code_snippet_3, code_style))
+content.append(Spacer(1, 12))
+content.append(Paragraph("In this step, we replace each category in the 'city' column with its corresponding mean price, "
+                         "creating a new column 'city_encoded'. This establishes a monotonic relationship between the categorical variable and the target variable.", normal_style))
 content.append(Spacer(1, 12))
 
-# Adding the second box plot image
-content.append(Paragraph("Box Plot of Marks (with outliers):", styles['Normal']))
-content.append(Image("box_plot_2.png", width=400, height=200))
-# content.append(Spacer(1, 12))
+# Section 4: Example with Seaborn Dataset
+content.append(Paragraph("4. Example with Seaborn Dataset", heading_style))
+content.append(Spacer(1, 12))
+code_snippet_4 = """
+import seaborn as sns
+df = sns.load_dataset('tips')
+mean_bill = df.groupby('time')['total_bill'].mean().to_dict()
+df['time_encoded'] = df['time'].map(mean_bill)
+df[['time', 'time_encoded']]
+"""
+content.append(Preformatted(code_snippet_4, code_style))
+content.append(Spacer(1, 12))
+content.append(Paragraph("In this section, we use the 'tips' dataset from the seaborn library to demonstrate the encoding technique. "
+                         "We calculate the mean total bill for each time of day and create a new encoded column.", normal_style))
+content.append(Spacer(1, 12))
 
 # Conclusion
-content.append(Paragraph("Conclusion", styles['Heading2']))
+content.append(Paragraph("Conclusion", heading_style))
 content.append(Spacer(1, 12))
-content.append(Paragraph("This report provided an overview of the five-number summary and box plots for a dataset of marks. "
-                         "These tools are essential for understanding the distribution and identifying outliers in the data.", styles['Normal']))
-# content.append(Spacer(1, 12))
+content.append(Paragraph("Target Guided Ordinal Encoding is a powerful technique for encoding categorical variables, "
+                         "especially when dealing with high cardinality. By establishing a relationship between the categorical variable and the target variable, "
+                         "we can improve the predictive power of our machine learning models.", normal_style))
+content.append(Spacer(1, 12))
 
 
-# Glossary Section
-content.append(Paragraph("Glossary", styles['Heading2']))
+# Glossary
+content.append(Paragraph("Glossary", heading_style))
 content.append(Spacer(1, 12))
-content.append(Paragraph("1. Five Number Summary: A descriptive statistic that provides information about a dataset's minimum, first quartile (Q1), median, third quartile (Q3), and maximum.", styles['Normal']))
-content.append(Paragraph("2. Box Plot: A graphical representation of the five-number summary that displays the distribution of data based on a five-number summary.", styles['Normal']))
-content.append(Paragraph("3. Outlier: A data point that differs significantly from other observations in the dataset.", styles['Normal']))
-content.append(Paragraph("4. Interquartile Range (IQR): A measure of statistical dispersion, calculated as the difference between the third quartile (Q3) and the first quartile (Q1).", styles['Normal']))
-# content.append(Spacer(1, 12))
+content.append(Paragraph("1. **Target Variable**: The variable that we are trying to predict or explain in a model.", normal_style))
+content.append(Spacer(1, 12))
+content.append(Paragraph("2. **Categorical Variable**: A variable that can take on one of a limited, and usually fixed, number of possible values, assigning each individual or other unit of observation to a particular group or nominal category.", normal_style))
+content.append(Spacer(1, 12))
+content.append(Paragraph("3. **Mean**: The average value of a set of numbers, calculated by dividing the sum of the values by the number of values.", normal_style))
+content.append(Spacer(1, 12))
+content.append(Paragraph("4. **Monotonic Relationship**: A relationship that is either entirely non-increasing or non-decreasing, meaning that as one variable increases, the other variable either only increases or only decreases.", normal_style))
+content.append(Spacer(1, 12))
+content.append(Paragraph("5. **Encoding**: The process of converting categorical data into a numerical format that can be provided to machine learning algorithms.", normal_style))
 
 # Build the PDF
 document.build(content)
 
-print("PDF report generated successfully: five_number_summary_report.pdf")
+print("PDF report generated successfully!")
