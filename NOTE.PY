@@ -392,7 +392,7 @@ content.append(Paragraph("Conclusion", title_style))
 content.append(Paragraph("In this report, we explored the SMOTE technique for handling imbalanced datasets. "
                          "We generated a synthetic dataset, visualized it, applied SMOTE to balance the classes, and visualized the results. "
                          "This technique is essential for improving the performance of machine learning models on imbalanced data.", intro_style))
-content.append(Spacer(1, 12))
+# content.append(Spacer(1, 12))
 
 content.append(Paragraph("SMOTE Glossary", title_style))
 smote_glossary_terms = {
